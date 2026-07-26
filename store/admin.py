@@ -1,6 +1,6 @@
 # store/admin.py
 from django.contrib import admin
-from .models import Product, Category, Cart, CartItem, Profile
+from .models import Product, Category, Cart, CartItem, Profile, StoreSettings
 
 
 @admin.register(Profile)
@@ -63,3 +63,14 @@ class CartItemAdmin(admin.ModelAdmin):
     def get_total_price_display(self, obj):
         return f"R$ {obj.get_total_price():.2f}"
     get_total_price_display.short_description = "Total do Item"
+
+
+@admin.register(StoreSettings)
+class StoreSettingsAdmin(admin.ModelAdmin):
+    list_display = ('site_title', 'contact_email', 'whatsapp_display', 'business_hours')
+
+    def has_add_permission(self, request):
+        # Bloqueia a criação de mais de um registro de configuração no admin
+        if StoreSettings.objects.exists():
+            return False
+        return super().has_add_permission(request)

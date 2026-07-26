@@ -1,24 +1,26 @@
 # store/context_processors.py
-from .models import Cart
+from .models import Cart, StoreSettings
 
-# Este context processor torna a contagem de itens do carrinho disponível
-# em todos os templates.
+
 def cart_items_count(request):
+    """Torna a contagem de itens do carrinho disponível em todos os templates."""
     cart_count = 0
-    # Se o usuário estiver autenticado, tenta obter a contagem do carrinho dele
     if request.user.is_authenticated:
-        # Verifica se o usuário tem um carrinho associado
         if hasattr(request.user, 'cart'):
             cart_count = request.user.cart.items.count()
-    # Se o usuário não estiver autenticado, tenta obter a contagem do carrinho da sessão
     elif 'cart_id' in request.session:
         try:
-            # Tenta buscar o carrinho pela ID armazenada na sessão
             cart = Cart.objects.get(id=request.session['cart_id'])
             cart_count = cart.items.count()
         except Cart.DoesNotExist:
-            # Se o carrinho não for encontrado (ex: sessão expirou, carrinho deletado),
-            # remove a ID do carrinho da sessão para evitar futuras tentativas.
             del request.session['cart_id']
-            pass # Não faz nada, a contagem permanece 0
+            pass
     return {'cart_items_count': cart_count}
+
+
+def store_settings(request):
+    """Torna os dados de contato e configurações globais visíveis em qualquer página do site."""
+    settings_obj = StoreSettings.objects.first()
+    if not settings_obj:
+        settings_obj = StoreSettings()  # Instância padrão caso a tabela ainda esteja vazia
+    return {'store_settings': settings_obj}
