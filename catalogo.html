@@ -7,7 +7,7 @@
 <title>Catálogo de Calçados | Jeci Store</title>
 <meta name="description" content="Explore todos os modelos de sandálias, rasteiras, papetes e saltos da Jeci Store. Conforto garantido.">
 
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2250%22 fill=%22%23F2A9C7%22/><text x=%2250%22 y=%2266%22 font-size=%2248%22 fill=%22%23fff%22 text-anchor=%22middle%22 font-family=%22Georgia%22 font-style=%22italic%22>Js</text></svg>">
+<link rel="icon" type="image/png" href="logo.png">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -66,10 +66,8 @@
 <header class="site-header">
   <div class="wrap header-inner">
     <a class="brand" href="index.html">
-      <span class="brand-word">
-        <em class="brand-script">Js</em>
-        <span class="brand-name">Jeci Store</span>
-      </span>
+      <img src="logo.png" alt="Jeci Store Logo" class="brand-logo-img">
+      <span class="brand-name">Jeci Store</span>
     </a>
 
     <nav class="main-nav" id="mainNav">
@@ -94,7 +92,7 @@
     <div class="wrap">
       <p class="eyebrow cute-sparkle">Coleção Completa de Calçados ✨</p>
       <h1 class="section-title">Nossos Modelos</h1>
-      <p style="max-width: 52ch; margin: 0 auto; color: var(--body-gray);">Escolha seu modelo favorito, veja avaliações reais e peça diretamente pelo WhatsApp.</p>
+      <p style="max-width: 52ch; margin: 0 auto; color: var(--body-gray);">Escolha seu calçado favorito, confira as avaliações reais e peça diretamente no WhatsApp.</p>
     </div>
   </section>
 
@@ -133,10 +131,10 @@
 <footer class="site-footer">
   <div class="wrap footer-inner">
     <div class="footer-brand">
-      <span class="brand-word">
-        <em class="brand-script">Js</em>
-        <span class="brand-name">Jeci Store</span>
-      </span>
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+        <img src="logo.png" alt="Logo" class="brand-logo-img">
+        <span style="font-weight:800; font-size:1.15rem; color:#fff;">Jeci Store</span>
+      </div>
       <p>Calçados femininos com estilo, conforto e exclusividade.</p>
     </div>
 
@@ -185,6 +183,11 @@
     return "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(message);
   }
 
+  function renderStars(rating) {
+    const full = Math.round(rating);
+    return "★".repeat(full) + "☆".repeat(5 - full);
+  }
+
   function renderGrid() {
     const term = searchInput.value.trim().toLowerCase();
     const cat = categorySelect.value;
@@ -202,7 +205,7 @@
     }
 
     if (sort === "rating") {
-      filtered.sort((a, b) => (b.avgRating || 5) - (a.avgRating || 5));
+      filtered.sort((a, b) => (b.avgRating || 0) - (a.avgRating || 0));
     } else if (sort === "price-asc") {
       filtered.sort((a, b) => a.preco - b.preco);
     } else if (sort === "price-desc") {
@@ -215,7 +218,7 @@
     grid.innerHTML = "";
 
     if (filtered.length === 0) {
-      grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:40px; color:var(--body-gray);">Nenhum calçado encontrado nesta categoria.</div>`;
+      grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:40px; color:var(--body-gray);">Nenhum calçado encontrado.</div>`;
       return;
     }
 
@@ -226,8 +229,25 @@
 
       const evals = prod.avaliacoes_produtos || [];
       const totalRatings = evals.length;
-      const avg = totalRatings > 0 ? evals.reduce((s, e) => s + e.estrelas, 0) / totalRatings : 5.0;
-      prod.avgRating = avg;
+      let ratingMarkup = "";
+
+      if (totalRatings > 0) {
+        const avg = evals.reduce((s, e) => s + e.estrelas, 0) / totalRatings;
+        prod.avgRating = avg;
+        ratingMarkup = `
+          <a href="produto.html?id=${prod.id}" class="product-rating-bar">
+            <span class="stars-val">${renderStars(avg)}</span>
+            <span class="rating-count">(${totalRatings}) Ver detalhes →</span>
+          </a>
+        `;
+      } else {
+        prod.avgRating = 0;
+        ratingMarkup = `
+          <a href="produto.html?id=${prod.id}" class="product-rating-bar">
+            <span class="rating-count" style="color:var(--body-gray); font-weight:600;">✨ Novo Modelo &middot; Avaliar</span>
+          </a>
+        `;
+      }
 
       const msg = `Olá! Tenho interesse no calçado:\n\n` +
         `* Código: ${prod.codigo}\n` +
@@ -246,10 +266,7 @@
           <span class="tag-price">R$${price.inteiro}<sup>,${price.centavos}</sup></span>
         </div>
         
-        <a href="produto.html?id=${prod.id}" class="product-rating-bar">
-          <span class="stars-val">${"★".repeat(Math.round(avg))}</span>
-          <span class="rating-count">(${totalRatings}) Ver detalhes →</span>
-        </a>
+        ${ratingMarkup}
 
         <span class="product-code-badge">${prod.codigo}</span>
         <h3><a href="produto.html?id=${prod.id}">${prod.nome}</a></h3>

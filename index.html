@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Jeci Store | Sandálias e Calçados Femininos com Estilo e Conforto</title>
-<meta name="description" content="Sandálias, rasteiras, papetes e saltos femininos com conforto e elegância. Loja 100% online, envio para todo o Brasil. Compre no WhatsApp.">
+<title>Jeci Store | Sandálias e Calçados Femininos com Conforto</title>
+<meta name="description" content="Sandálias, rasteiras, papetes e saltos femininos elegantes e confortáveis. Loja 100% online com envio para todo o Brasil.">
 
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2250%22 fill=%22%23F2A9C7%22/><text x=%2250%22 y=%2266%22 font-size=%2248%22 fill=%22%23fff%22 text-anchor=%22middle%22 font-family=%22Georgia%22 font-style=%22italic%22>Js</text></svg>">
+<link rel="icon" type="image/png" href="logo.png">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,16 +22,8 @@
 <header class="site-header" id="topo">
   <div class="wrap header-inner">
     <a class="brand" href="#topo" aria-label="Jeci Store - início">
-      <span class="brand-mark cute-bounce">
-        <svg viewBox="0 0 48 40" width="30" height="26">
-          <path d="M24 8c-3-6-11-8-15-4-4 4-2 12 4 16 4 3 8 4 11 4 3 0 7-1 11-4 6-4 8-12 4-16-4-4-12-2-15 4z" fill="none" stroke="currentColor" stroke-width="1.6"/>
-          <path d="M24 8v26M24 20c-2 2-3 5-2 8M24 20c2 2 3 5 2 8" fill="none" stroke="currentColor" stroke-width="1.4"/>
-        </svg>
-      </span>
-      <span class="brand-word">
-        <em class="brand-script">Js</em>
-        <span class="brand-name">Jeci Store</span>
-      </span>
+      <img src="logo.png" alt="Jeci Store Logo" class="brand-logo-img cute-bounce">
+      <span class="brand-name">Jeci Store</span>
     </a>
 
     <nav class="main-nav" id="mainNav">
@@ -56,13 +48,12 @@
 </header>
 
 <main>
-  <!-- ============ HERO ============ -->
   <section class="hero" aria-labelledby="hero-title">
     <div class="wrap hero-inner">
       <div class="hero-copy">
-        <p class="eyebrow cute-sparkle">Loja online de calçados &middot; entrega para todo o Brasil ✨</p>
+        <p class="eyebrow cute-sparkle">Loja online de calçados &middot; envio para todo o Brasil ✨</p>
         <h1 id="hero-title">Calce o conforto,<br><span class="accent-word">desfile seu estilo.</span></h1>
-        <p class="hero-sub">Descubra as sandálias, rasteiras e papetes perfeitas para elevar qualquer look sem abrir mão do bem-estar dos seus pés.</p>
+        <p class="hero-sub">Descubra as sandálias, rasteiras e papetes perfeitas para elevar seus looks sem abrir mão do bem-estar dos seus pés.</p>
         <div class="hero-cta">
           <a class="btn btn-whatsapp btn-lg js-whatsapp" data-msg="Olá! Gostaria de ver os calçados disponíveis no meu tamanho." href="#" target="_blank" rel="noopener">
             Comprar no WhatsApp
@@ -80,10 +71,7 @@
         <span class="hero-butterfly hero-butterfly-1">
           <svg viewBox="0 0 48 40" width="34" height="28"><path d="M24 8c-3-6-11-8-15-4-4 4-2 12 4 16 4 3 8 4 11 4 3 0 7-1 11-4 6-4 8-12 4-16-4-4-12-2-15 4z" fill="none" stroke="var(--pink-deep)" stroke-width="1.4"/><path d="M24 8v26" stroke="var(--pink-deep)" stroke-width="1.2"/></svg>
         </span>
-        <div class="hero-badge">
-          <span class="hero-badge-script">Js</span>
-          <span class="hero-badge-name">JECI STORE</span>
-        </div>
+        <img src="logo.png" alt="Logo Jeci Store" class="hero-badge-img">
         <div class="swing-tag hero-tag">
           <span class="tag-label">sandálias a partir de</span>
           <span class="tag-price">R$59<sup>,90</sup></span>
@@ -92,7 +80,6 @@
     </div>
   </section>
 
-  <!-- ============ CATEGORIAS ============ -->
   <section class="section section-alt" id="categorias">
     <div class="wrap">
       <p class="eyebrow center">Modelos para cada ocasião</p>
@@ -123,31 +110,25 @@
     </div>
   </section>
 
-  <!-- ============ DESTAQUES ============ -->
   <section class="section" id="produtos">
     <div class="wrap">
       <p class="eyebrow center">Mais amados da semana</p>
       <h2 class="section-title center">Destaques</h2>
 
-      <div class="product-grid" id="productGrid">
-        <!-- Renderizado dinamicamente via script.js -->
-      </div>
+      <div class="product-grid" id="productGrid"></div>
 
-      <p class="center product-more">
+      <p class="center" style="margin-top: 40px;">
         <a class="btn btn-outline" href="catalogo.html">Ver catálogo completo de calçados →</a>
       </p>
     </div>
   </section>
 
-  <!-- ============ FEEDBACKS REAIS ============ -->
   <section class="section section-alt" id="depoimentos">
     <div class="wrap">
       <p class="eyebrow center">Quem já comprou e amou 💕</p>
       <h2 class="section-title center">Feedbacks & Avaliações</h2>
 
-      <div class="testi-grid" id="testiGrid">
-        <!-- Injetado dinamicamente com os feedbacks reais -->
-      </div>
+      <div class="testi-grid" id="testiGrid"></div>
 
       <div class="review-box-card">
         <h3>Deixe seu Feedback</h3>
@@ -171,14 +152,31 @@
     </div>
   </section>
 
-  <!-- ============ SOBRE ============ -->
   <section class="section" id="sobre">
     <div class="wrap wrap-narrow">
       <div class="about-card">
         <h2 class="center">Sobre a Jeci Store</h2>
-        <p>A <strong>Jeci Store</strong> nasceu da paixão da nossa fundadora, Jeciane Garcia, por calçados femininos que combinam as maiores tendências com o máximo de conforto.</p>
+        <p>A <strong>Jeci Store</strong> nasceu da paixão da fundadora Jeciane Garcia por calçados femininos que combinam as maiores tendências com o máximo de conforto.</p>
         <p>Cada calçado é selecionado com cuidado, acompanhado de embalagem exclusiva e mimos especiais em cada pedido.</p>
         <p class="about-signature center">Calce o conforto, viva o seu estilo! 🌸</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-alt" id="faq">
+    <div class="wrap wrap-narrow">
+      <p class="eyebrow center">Tire suas dúvidas</p>
+      <h2 class="section-title center">Perguntas Frequentes</h2>
+
+      <div class="faq-list" style="border-top:1px solid rgba(227,73,136,0.18);">
+        <div class="faq-item" style="border-bottom:1px solid rgba(227,73,136,0.18); padding:16px 0;">
+          <h4 style="margin:0 0 6px;">Como sei meu tamanho exato?</h4>
+          <p style="margin:0; font-size:0.92rem;">Nossos calçados possuem forma padrão do 34 ao 40. Pelo WhatsApp nós auxiliamos na medição da palmilha se preferir.</p>
+        </div>
+        <div class="faq-item" style="border-bottom:1px solid rgba(227,73,136,0.18); padding:16px 0;">
+          <h4 style="margin:0 0 6px;">Qual a política de trocas?</h4>
+          <p style="margin:0; font-size:0.92rem;">Garantimos a troca fácil do calçado em até 7 dias corridos após a entrega.</p>
+        </div>
       </div>
     </div>
   </section>
@@ -187,16 +185,16 @@
 <footer class="site-footer" id="contato">
   <div class="wrap footer-inner">
     <div class="footer-brand">
-      <span class="brand-word">
-        <em class="brand-script">Js</em>
-        <span class="brand-name">Jeci Store</span>
-      </span>
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+        <img src="logo.png" alt="Logo" class="brand-logo-img">
+        <span style="font-weight:800; font-size:1.15rem; color:#fff;">Jeci Store</span>
+      </div>
       <p>Sandálias, rasteiras e calçados femininos com carinho e conforto.</p>
     </div>
 
     <div class="footer-col">
       <h4>Contato</h4>
-      <p>Atendimento online de segunda a sábado</p>
+      <p>Atendimento de segunda a sábado</p>
       <a class="footer-whatsapp js-whatsapp" href="#" target="_blank">+55 86 98124-7491</a>
       <a href="https://www.instagram.com/jecistore" target="_blank">@jecistore</a>
     </div>

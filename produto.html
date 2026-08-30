@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Detalhes do Calçado | Jeci Store</title>
 
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2250%22 fill=%22%23F2A9C7%22/><text x=%2250%22 y=%2266%22 font-size=%2248%22 fill=%22%23fff%22 text-anchor=%22middle%22 font-family=%22Georgia%22 font-style=%22italic%22>Js</text></svg>">
+<link rel="icon" type="image/png" href="logo.png">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,7 +18,7 @@
   .product-details-wrap { display: grid; grid-template-columns: 1fr 1.1fr; gap: 40px; margin-top: 36px; }
   .product-gallery-card {
     background: var(--paper); border-radius: var(--radius); padding: 18px;
-    border: 1.5px solid rgba(226,78,138,0.15); box-shadow: var(--shadow-soft);
+    border: 1.5px solid rgba(227,73,136,0.15); box-shadow: var(--shadow-soft);
     position: relative; overflow: hidden;
   }
   .product-gallery-card img { width: 100%; border-radius: 14px; object-fit: cover; aspect-ratio: 1/1; }
@@ -29,7 +29,7 @@
   .sizes-selector-box { margin: 20px 0; }
   .sizes-chips-list { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
   .size-btn {
-    border: 1.5px solid rgba(46,49,66,0.2); background: #fff; padding: 8px 16px;
+    border: 1.5px solid rgba(42,40,56,0.2); background: #fff; padding: 8px 16px;
     border-radius: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s;
   }
   .size-btn.selected, .size-btn:hover { background: var(--pink-deep); color: #fff; border-color: var(--pink-deep); transform: scale(1.05); }
@@ -38,7 +38,7 @@
   .reviews-list { display: flex; flex-direction: column; gap: 14px; margin-top: 20px; }
   .review-item-card {
     background: var(--cream); border-radius: 14px; padding: 18px 20px;
-    border: 1px solid rgba(226,78,138,0.12);
+    border: 1px solid rgba(227,73,136,0.12);
   }
 </style>
 </head>
@@ -47,10 +47,8 @@
 <header class="site-header">
   <div class="wrap header-inner">
     <a class="brand" href="index.html">
-      <span class="brand-word">
-        <em class="brand-script">Js</em>
-        <span class="brand-name">Jeci Store</span>
-      </span>
+      <img src="logo.png" alt="Jeci Store Logo" class="brand-logo-img">
+      <span class="brand-name">Jeci Store</span>
     </a>
     <nav class="main-nav" id="mainNav">
       <a href="index.html">Início</a>
@@ -67,14 +65,14 @@
   <div class="product-details-wrap" id="productDetails">
     <div class="product-gallery-card">
       <img id="prodImage" src="" alt="Calçado">
-      <span class="cute-sparkle">✨</span>
+      <span class="cute-sparkle" style="position:absolute; top:24px; right:24px; font-size:1.6rem;">✨</span>
     </div>
     <div class="product-info-panel">
       <span class="product-code-badge" id="prodCode">...</span>
       <h1 id="prodName">Carregando...</h1>
       <div class="product-rating-bar" style="margin-bottom: 14px;">
-        <span class="stars-val" id="prodStars">★★★★★</span>
-        <span class="rating-count" id="prodRatingText">(0 avaliações)</span>
+        <span class="stars-val" id="prodStars"></span>
+        <span class="rating-count" id="prodRatingText">Carregando...</span>
       </div>
       <div class="product-info-price" id="prodPrice">R$ 0,00</div>
       <p class="product-desc" id="prodDesc" style="font-size: 1rem; line-height: 1.7;"></p>
@@ -95,7 +93,7 @@
   <section class="reviews-section">
     <div class="review-box-card" style="max-width: 100%; text-align: left; margin-top: 40px;">
       <h3>Avaliações deste Calçado</h3>
-      <p>Já comprou ou experimentou este modelo? Deixe sua nota para ajudar outras clientes!</p>
+      <p>Já comprou ou experimentou este modelo? Deixe sua nota sincera para ajudar outras clientes!</p>
 
       <form id="productReviewForm" class="review-form" style="margin-top: 20px;">
         <div class="review-inputs">
@@ -167,7 +165,7 @@
     document.getElementById("prodCode").textContent = prod.codigo;
     document.getElementById("prodName").textContent = prod.nome;
     document.getElementById("prodPrice").textContent = `R$ ${Number(prod.preco).toFixed(2).replace('.', ',')}`;
-    document.getElementById("prodDesc").textContent = prod.descricao || "Sandália feminina desenvolvida para conforto e elegância diária.";
+    document.getElementById("prodDesc").textContent = prod.descricao || "Calçado feminino confeccionado para o seu conforto diário.";
 
     const sizesContainer = document.getElementById("prodSizes");
     sizesContainer.innerHTML = "";
@@ -196,7 +194,7 @@
       `* Preço: R$ ${Number(currentProduct.preco).toFixed(2)}\n` +
       `* Tamanho Selecionado: ${selectedSize || 'A combinar'}\n` +
       `* Foto: ${currentProduct.imagem}\n\n` +
-      `Gostaria de saber se ainda está disponível!`;
+      `Gostaria de confirmar a disponibilidade!`;
     
     document.getElementById("btnBuyWhatsapp").href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
   }
@@ -216,14 +214,15 @@
     }
 
     if (!reviews.length) {
-      listEl.innerHTML = `<p style="color:var(--body-gray); font-size:0.9rem;">Este modelo ainda não tem avaliações. Seja a primeira a avaliar!</p>`;
-      document.getElementById("prodStars").textContent = "★★★★★";
-      document.getElementById("prodRatingText").textContent = "(Novo modelo)";
+      listEl.innerHTML = `<p style="color:var(--body-gray); font-size:0.92rem; padding:12px 0;">Este calçado ainda não recebeu avaliações. Seja a primeira a avaliar!</p>`;
+      document.getElementById("prodStars").textContent = "";
+      document.getElementById("prodRatingText").textContent = "✨ Novo Modelo (Sem avaliações ainda)";
       return;
     }
 
     const avg = reviews.reduce((acc, r) => acc + r.estrelas, 0) / reviews.length;
-    document.getElementById("prodStars").textContent = "★".repeat(Math.round(avg)) + "☆".repeat(5 - Math.round(avg));
+    const full = Math.round(avg);
+    document.getElementById("prodStars").textContent = "★".repeat(full) + "☆".repeat(5 - full);
     document.getElementById("prodRatingText").textContent = `(${reviews.length} avaliação${reviews.length > 1 ? 'ões' : ''})`;
 
     listEl.innerHTML = "";
@@ -231,9 +230,9 @@
       const card = document.createElement("div");
       card.className = "review-item-card";
       card.innerHTML = `
-        <div style="color:#f59e0b; font-size:0.9rem; margin-bottom:4px;">${"★".repeat(r.estrelas)}</div>
-        <p style="margin:0 0 6px; font-weight:600; color:var(--ink);">${r.comentario}</p>
-        <span style="font-size:0.8rem; color:var(--body-gray);">Por <strong>${r.nome_cliente || r.nome}</strong></span>
+        <div style="color:var(--gold); font-size:0.95rem; margin-bottom:4px;">${"★".repeat(r.estrelas)}</div>
+        <p style="margin:0 0 6px; font-weight:600; color:var(--ink);">${r.comentario || 'Avaliação sem texto'}</p>
+        <span style="font-size:0.8rem; color:var(--body-gray);">Por <strong>${r.nome_cliente || 'Cliente'}</strong></span>
       `;
       listEl.appendChild(card);
     });
@@ -241,15 +240,17 @@
 
   // Seletor de estrelas
   const starSpans = document.querySelectorAll("#formStarSelector span");
-  starSpans.forEach(span => {
-    span.addEventListener("click", function() {
-      selectedRating = parseInt(this.getAttribute("data-val"));
-      starSpans.forEach(s => {
-        const v = parseInt(s.getAttribute("data-val"));
-        s.classList.toggle("active", v <= selectedRating);
-      });
+  function setStars(v) {
+    selectedRating = v;
+    starSpans.forEach(s => {
+      const val = parseInt(s.getAttribute("data-val"));
+      s.classList.toggle("active", val <= v);
     });
+  }
+  starSpans.forEach(span => {
+    span.addEventListener("click", () => setStars(parseInt(span.getAttribute("data-val"))));
   });
+  setStars(5);
 
   document.getElementById("productReviewForm").addEventListener("submit", async function(e) {
     e.preventDefault();
@@ -270,6 +271,7 @@
     }
 
     this.reset();
+    setStars(5);
     alert("Obrigada! Sua avaliação foi cadastrada com sucesso.");
     loadReviews();
   });

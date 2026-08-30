@@ -26,13 +26,11 @@
   }
 
   function renderStars(rating) {
-    const full = Math.round(rating || 5);
+    const full = Math.round(rating);
     return "★".repeat(full) + "☆".repeat(5 - full);
   }
 
-  /* =====================================================
-     RENDERIZAÇÃO DOS DESTAQUES
-     ===================================================== */
+  /* RENDERIZAÇÃO DOS DESTAQUES */
   function renderProducts(list) {
     const grid = document.getElementById("productGrid");
     if (!grid) return;
@@ -47,16 +45,30 @@
 
       const evals = prod.avaliacoes_produtos || [];
       const totalRatings = evals.length;
-      const avgRating = totalRatings > 0 
-        ? evals.reduce((sum, e) => sum + e.estrelas, 0) / totalRatings 
-        : 5.0;
+      
+      let ratingMarkup = "";
+      if (totalRatings > 0) {
+        const avg = evals.reduce((sum, e) => sum + e.estrelas, 0) / totalRatings;
+        ratingMarkup = `
+          <a href="produto.html?id=${prod.id}" class="product-rating-bar" title="Ver avaliações">
+            <span class="stars-val">${renderStars(avg)}</span>
+            <span class="rating-count">(${totalRatings}) Ver detalhes →</span>
+          </a>
+        `;
+      } else {
+        ratingMarkup = `
+          <a href="produto.html?id=${prod.id}" class="product-rating-bar">
+            <span class="rating-count" style="color:var(--body-gray); font-weight:600;">✨ Novo Modelo &middot; Avaliar</span>
+          </a>
+        `;
+      }
 
       const msg = `Olá! Tenho interesse na sandália:\n\n` +
         `* Código: ${prod.codigo}\n` +
         `* Modelo: ${prod.nome}\n` +
         `* Preço: R$ ${Number(prod.preco).toFixed(2)}\n` +
         `* Foto: ${prod.imagem}\n\n` +
-        `Gostaria de confirmar a disponibilidade no meu número.`;
+        `Gostaria de saber a disponibilidade no meu número.`;
 
       article.innerHTML = `
         <div class="product-art-wrapper">
@@ -68,19 +80,16 @@
           <span class="tag-price">R$${price.inteiro}<sup>,${price.centavos}</sup></span>
         </div>
         
-        <a href="produto.html?id=${prod.id}" class="product-rating-bar" title="Ver avaliações">
-          <span class="stars-val">${renderStars(avgRating)}</span>
-          <span class="rating-count">(${totalRatings}) Ver detalhes →</span>
-        </a>
+        ${ratingMarkup}
 
         <span class="product-code-badge">${prod.codigo}</span>
         <h3><a href="produto.html?id=${prod.id}">${prod.nome}</a></h3>
         <p class="product-desc">${prod.descricao || ""}</p>
-        <p class="product-sizes-badge">Numerações: ${(prod.tamanhos || []).join(", ") || "34 ao 39"}</p>
+        <p class="product-sizes-badge">Numerações: ${(Array.isArray(prod.tamanhos) ? prod.tamanhos : []).join(", ") || "34 ao 39"}</p>
         
         <div style="display:flex; gap:8px; margin-top:auto;">
           <a class="btn btn-whatsapp btn-block js-whatsapp" href="${getWhatsappLink(msg)}" target="_blank" rel="noopener">Comprar</a>
-          <a class="btn btn-outline" href="produto.html?id=${prod.id}" style="padding:10px 14px;" title="Ver produto">🔍</a>
+          <a class="btn btn-outline" href="produto.html?id=${prod.id}" style="padding:10px 14px;" title="Ver detalhes">🔍</a>
         </div>
       `;
 
@@ -90,9 +99,7 @@
     setupScrollReveal();
   }
 
-  /* =====================================================
-     FEEDBACKS DA LOJA
-     ===================================================== */
+  /* RENDERIZAÇÃO DOS FEEDBACKS REAIS */
   function renderReviews() {
     const grid = document.getElementById("testiGrid");
     if (!grid) return;
@@ -114,7 +121,6 @@
   }
 
   async function loadInitialData() {
-    // 1. Depoimentos
     if (db) {
       const { data } = await db.from("depoimentos_loja").select("*").order("created_at", { ascending: false });
       reviews = (data && data.length) ? data : DEFAULT_REVIEWS;
@@ -123,7 +129,6 @@
     }
     renderReviews();
 
-    // 2. Produtos com Avaliações Relacionais
     if (db) {
       const { data } = await db.from("produtos").select("*, avaliacoes_produtos(estrelas)").order("created_at", { ascending: false });
       if (data && data.length) {
@@ -148,18 +153,20 @@
     } catch (e) {}
   }
 
-  // Formulário de feedback público
   let storeStars = 5;
   const starBtns = document.querySelectorAll("#starSelector span");
-  starBtns.forEach(s => {
-    s.addEventListener("click", function() {
-      storeStars = parseInt(this.getAttribute("data-star"));
-      starBtns.forEach(el => {
-        const v = parseInt(el.getAttribute("data-star"));
-        el.classList.toggle("active", v <= storeStars);
-      });
+  function updateStars(val) {
+    storeStars = val;
+    starBtns.forEach(btn => {
+      const sVal = parseInt(btn.getAttribute("data-star"));
+      btn.classList.toggle("active", sVal <= val);
     });
+  }
+
+  starBtns.forEach(btn => {
+    btn.addEventListener("click", () => updateStars(parseInt(btn.getAttribute("data-star"))));
   });
+  updateStars(5);
 
   const storeForm = document.getElementById("storeReviewForm");
   if (storeForm) {
@@ -181,7 +188,8 @@
       localStorage.setItem("jeci_reviews", JSON.stringify(reviews));
       renderReviews();
       storeForm.reset();
-      alert("Obrigada pelo feedback! Sua avaliação foi publicada.");
+      updateStars(5);
+      alert("Obrigada pelo feedback! Sua avaliação foi publicada com sucesso.");
     });
   }
 

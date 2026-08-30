@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Painel Administrativo | Jeci Store</title>
+
+<link rel="icon" type="image/jpeg" href="logo.png">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
@@ -14,7 +17,6 @@
   body { background: var(--cream); padding: 30px 0; min-height: 100vh; }
   .admin-wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
   
-  /* Modal de Login */
   .auth-overlay {
     position: fixed; inset: 0; background: var(--cream);
     display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
@@ -26,11 +28,9 @@
   }
   .auth-error { color: #dc3545; font-size: 0.88rem; font-weight: 700; margin-top: 12px; display: none; }
 
-  /* Estrutura do Painel */
   .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 14px; }
   .admin-card { background: var(--paper); border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow-card); margin-bottom: 26px; border: 1.5px solid rgba(227,73,136,0.12); }
   
-  /* Navegação em Abas */
   .admin-tabs {
     display: flex; gap: 10px; margin-bottom: 24px; border-bottom: 2px solid rgba(227,73,136,0.15); padding-bottom: 12px; flex-wrap: wrap;
   }
@@ -46,7 +46,6 @@
   .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-  /* Formulário de Calçados */
   .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
   .form-group { display: flex; flex-direction: column; gap: 6px; }
   .form-group.full { grid-column: span 2; }
@@ -72,7 +71,6 @@
   .image-preview-slot img { width: 100%; height: 100%; object-fit: cover; }
   .image-inputs { display: flex; flex-direction: column; gap: 8px; flex-grow: 1; }
 
-  /* Tabelas */
   .table-responsive { overflow-x: auto; }
   table { width: 100%; border-collapse: collapse; text-align: left; margin-top: 14px; }
   th, td { padding: 14px 12px; border-bottom: 1px solid rgba(42,40,56,0.08); font-size: 0.92rem; vertical-align: middle; }
@@ -86,7 +84,6 @@
   .status-btn.inactive { background: #f8d7da; color: #721c24; }
   .preview-thumb { width: 48px; height: 48px; object-fit: cover; border-radius: 8px; }
 
-  /* Cards de Estatísticas */
   .stat-badge {
     display: inline-block; background: var(--pink-light); color: var(--pink-deep);
     padding: 4px 12px; border-radius: 20px; font-weight: 800; font-size: 0.82rem; margin-left: 8px;
@@ -98,11 +95,10 @@
 </head>
 <body>
 
-<!-- MODAL DE AUTENTICAÇÃO -->
 <div class="auth-overlay" id="authOverlay">
   <div class="auth-card">
-    <span class="brand-script" style="font-size: 3rem; color: var(--pink-deep); display: block; margin-bottom: 8px;">Js</span>
-    <h2>Área Restrita</h2>
+    <img src="logo.png" alt="Logo" class="brand-logo-img cute-bounce" style="width:70px; height:70px; margin:0 auto 14px;">
+    <h2>Painel da Loja</h2>
     <p>Digite a senha administrativa da Jeci Store:</p>
     <form id="authForm">
       <input type="password" id="adminPass" placeholder="••••••••" required style="width: 100%; margin-bottom: 14px; padding: 12px; text-align: center;">
@@ -112,12 +108,14 @@
   </div>
 </div>
 
-<!-- CONTEÚDO DO PAINEL -->
 <div class="admin-wrap" id="adminContent" style="display: none;">
   <div class="admin-header">
-    <div>
-      <h1>Painel de Controle 👡</h1>
-      <p>Gerencie calçados, fotos e modere avaliações</p>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <img src="logo.png" alt="Logo" class="brand-logo-img">
+      <div>
+        <h1 style="margin:0; font-size:1.6rem;">Painel de Controle</h1>
+        <p style="margin:0;">Gerencie calçados e modere avaliações reais</p>
+      </div>
     </div>
     <div style="display:flex; gap:10px; flex-wrap:wrap;">
       <a href="index.html" class="btn btn-outline btn-sm">← Ver Loja</a>
@@ -126,14 +124,13 @@
     </div>
   </div>
 
-  <!-- NAVEGAÇÃO ENTRE ABAS -->
   <div class="admin-tabs">
     <button class="tab-btn active" onclick="switchTab('tab-calcados')">📦 Calçados</button>
     <button class="tab-btn" onclick="switchTab('tab-avaliacoes-produtos')">⭐ Avaliações dos Calçados <span class="stat-badge" id="badgeCountProdReviews">0</span></button>
     <button class="tab-btn" onclick="switchTab('tab-depoimentos-loja')">💬 Feedbacks da Loja <span class="stat-badge" id="badgeCountStoreReviews">0</span></button>
   </div>
 
-  <!-- ==================== ABA 1: CALÇADOS ==================== -->
+  <!-- ABA 1: CALÇADOS -->
   <div class="tab-content active" id="tab-calcados">
     <div class="admin-card">
       <h2 id="formTitle">Novo Calçado</h2>
@@ -195,8 +192,8 @@
           </div>
 
           <div class="form-group full">
-            <label for="descricao">Descrição (Palmilha, conforto, detalhes...)</label>
-            <textarea id="descricao" rows="2" placeholder="Detalhes do calçado, acabamento, palmilha macia..."></textarea>
+            <label for="descricao">Descrição</label>
+            <textarea id="descricao" rows="2" placeholder="Detalhes do calçado, palmilha, acabamento..."></textarea>
           </div>
 
           <div class="form-group full" style="display:flex; gap:24px;">
@@ -236,14 +233,14 @@
     </div>
   </div>
 
-  <!-- ==================== ABA 2: AVALIAÇÕES DOS CALÇADOS ==================== -->
+  <!-- ABA 2: AVALIAÇÕES DOS PRODUTOS -->
   <div class="tab-content" id="tab-avaliacoes-produtos">
     <div class="admin-card">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
         <h2>Moderação de Avaliações por Calçado</h2>
         <button class="btn btn-outline btn-sm" onclick="loadProductReviews()">🔄 Atualizar</button>
       </div>
-      <p style="margin-bottom:18px;">Gerencie e exclua notas ou comentários enviados por clientes na página de cada produto.</p>
+      <p style="margin-bottom:18px;">Notas e comentários enviados por clientes reais.</p>
       
       <div class="table-responsive">
         <table>
@@ -265,11 +262,11 @@
     </div>
   </div>
 
-  <!-- ==================== ABA 3: FEEDBACKS DA LOJA ==================== -->
+  <!-- ABA 3: FEEDBACKS DA LOJA -->
   <div class="tab-content" id="tab-depoimentos-loja">
     <div class="admin-card">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-        <h2>Moderação de Feedbacks Gerais da Loja</h2>
+        <h2>Moderação de Feedbacks da Loja</h2>
         <button class="btn btn-outline btn-sm" onclick="loadStoreReviews()">🔄 Atualizar</button>
       </div>
       <p style="margin-bottom:18px;">Depoimentos que aparecem na página inicial da Jeci Store.</p>
@@ -293,7 +290,6 @@
       </div>
     </div>
   </div>
-
 </div>
 
 <script>
@@ -306,7 +302,6 @@
   let storeReviews = [];
   let currentImageUrl = "";
 
-  /* CONTROLE DE ABAS */
   window.switchTab = function(tabId) {
     document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
     document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
@@ -347,7 +342,7 @@
     await loadStoreReviews();
   }
 
-  /* ==================== 1. CALÇADOS ==================== */
+  /* 1. CALÇADOS */
   async function loadProducts() {
     if (db) {
       const { data } = await db.from("produtos").select("*").order("created_at", { ascending: false });
@@ -508,7 +503,7 @@
     alert("Calçado salvo com sucesso!");
   });
 
-  /* ==================== 2. AVALIAÇÕES DOS PRODUTOS ==================== */
+  /* 2. AVALIAÇÕES DOS PRODUTOS */
   window.loadProductReviews = async function() {
     const tbody = document.getElementById("tableBodyProdReviews");
     if (db) {
@@ -551,7 +546,7 @@
     }
   };
 
-  /* ==================== 3. DEPOIMENTOS DA LOJA ==================== */
+  /* 3. DEPOIMENTOS DA LOJA */
   window.loadStoreReviews = async function() {
     const tbody = document.getElementById("tableBodyStoreReviews");
     if (db) {
@@ -592,7 +587,6 @@
     }
   };
 
-  /* EXPORTAÇÃO JSON */
   document.getElementById("btnExport").addEventListener("click", function() {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(products, null, 2));
     const dl = document.createElement("a");
