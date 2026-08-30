@@ -6,16 +6,39 @@
 
 <title>Jeci Store | Sandálias e Calçados Femininos com Conforto</title>
 <meta name="description" content="Sandálias, rasteiras, papetes e saltos femininos elegantes e confortáveis. Loja 100% online com envio para todo o Brasil.">
+<link rel="canonical" href="https://www.jecistore.com.br/">
+<meta name="robots" content="index, follow">
+
+<!-- Open Graph & Social Cards -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Jeci Store | Sandálias e Calçados Femininos com Conforto">
+<meta property="og:description" content="Sandálias, rasteiras, papetes e saltos femininos elegantes e confortáveis. Loja 100% online com envio para todo o Brasil.">
+<meta property="og:image" content="https://www.jecistore.com.br/logo.png">
+<meta property="og:url" content="https://www.jecistore.com.br/">
+
+<!-- Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ClothingStore",
+  "name": "Jeci Store",
+  "founder": { "@type": "Person", "name": "Jeciane Cavalcante" },
+  "telephone": "+55-86-98124-7491",
+  "sameAs": ["https://www.instagram.com/jecistore"]
+}
+</script>
 
 <link rel="icon" type="image/png" href="logo.png">
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&family=Pinyon+Script&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="personality.css">
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
+<script src="jeci-ui.js"></script>
 </head>
 <body>
 
@@ -30,20 +53,26 @@
       <a href="#sobre">Sobre</a>
       <a href="#categorias">Categorias</a>
       <a href="#produtos">Destaques</a>
-      <a href="catalogo.html">Catálogo Completo</a>
-      <a href="carrinho.html">Meu Carrinho 🛍️</a>
+      <a href="catalogo.html">Catálogo</a>
       <a href="#depoimentos">Feedbacks</a>
       <a href="#faq">Dúvidas</a>
       <a href="#contato">Contato</a>
     </nav>
 
     <div class="header-actions">
-      <a class="btn btn-whatsapp btn-sm" href="carrinho.html" title="Ver Carrinho">
-        <span>🛍️ (<span id="homeCartCount">0</span>)</span>
+      <a class="header-cart-btn" href="carrinho.html" title="Ver Carrinho de Compras" aria-label="Carrinho">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <path d="M16 10a4 4 0 0 1-8 0"></path>
+        </svg>
+        <span class="cart-badge-count" id="headerCartBadge">0</span>
       </a>
+
       <a class="btn btn-whatsapp btn-sm js-whatsapp" data-msg="Olá! Vim pelo site da Jeci Store e quero tirar uma dúvida." href="#" target="_blank" rel="noopener">
         <span>WhatsApp</span>
       </a>
+
       <button class="nav-toggle" id="navToggle" aria-label="Abrir menu">
         <span></span><span></span><span></span>
       </button>
@@ -160,9 +189,14 @@
     <div class="wrap wrap-narrow">
       <div class="about-card">
         <h2 class="center">Sobre a Jeci Store</h2>
-        <p>A <strong>Jeci Store</strong> nasceu da paixão da fundadora Jeciane Garcia por calçados femininos que combinam as maiores tendências com o máximo de conforto.</p>
+        <p>A <strong>Jeci Store</strong> nasceu da paixão por calçados femininos que combinam as maiores tendências com o máximo de conforto.</p>
         <p>Cada calçado é selecionado com cuidado, acompanhado de embalagem exclusiva e mimos especiais em cada pedido.</p>
-        <p class="about-signature center">Calce o conforto, viva o seu estilo! 🌸</p>
+        
+        <div class="founder-note">
+          <p>“Criamos cada detalhe da loja pensando no conforto do seu dia a dia e na alegria de receber um pacote cheio de carinho.”</p>
+          <span class="founder-signature">Jeciane Cavalcante</span>
+          <span class="founder-role">Fundadora da Jeci Store</span>
+        </div>
       </div>
     </div>
   </section>
@@ -199,8 +233,8 @@
     <div class="footer-col">
       <h4>Contato</h4>
       <p>Atendimento de segunda a sábado</p>
-      <a class="footer-whatsapp js-whatsapp" href="#" target="_blank">+55 86 98124-7491</a>
-      <a href="https://www.instagram.com/jecistore" target="_blank">@jecistore</a>
+      <a class="footer-whatsapp js-whatsapp" href="#" target="_blank" rel="noopener">+55 86 98124-7491</a>
+      <a href="https://www.instagram.com/jecistore" target="_blank" rel="noopener">@jecistore</a>
     </div>
 
     <div class="footer-col">
@@ -223,14 +257,5 @@
 </a>
 
 <script src="script.js"></script>
-<script>
-  function updateHomeBadge() {
-    const cart = JSON.parse(localStorage.getItem("jeci_cart") || "[]");
-    const count = cart.reduce((s, i) => s + i.qtd, 0);
-    const badge = document.getElementById("homeCartCount");
-    if (badge) badge.textContent = count;
-  }
-  document.addEventListener("DOMContentLoaded", updateHomeBadge);
-</script>
 </body>
 </html>

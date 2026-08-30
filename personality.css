@@ -1,0 +1,160 @@
+/* =========================================================
+   JECI STORE — camada de personalidade
+   ========================================================= */
+::selection {
+  background: var(--pink-deep, #E34988);
+  color: #fff;
+}
+
+html {
+  scrollbar-color: var(--pink-mid, #F4A8C8) var(--cream, #FFF8FA);
+  scrollbar-width: thin;
+}
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--cream, #FFF8FA); }
+::-webkit-scrollbar-thumb {
+  background: var(--pink-mid, #F4A8C8);
+  border-radius: 999px;
+  border: 2px solid var(--cream, #FFF8FA);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--pink-deep, #E34988); }
+
+.jeci-toast-host {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+}
+
+.jeci-toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--ink, #2A2838);
+  color: #fff;
+  font-family: var(--font-body, sans-serif);
+  font-weight: 700;
+  font-size: 0.92rem;
+  padding: 13px 20px;
+  border-radius: 999px;
+  box-shadow: 0 14px 30px -10px rgba(46, 49, 66, 0.45);
+  border: 1.5px solid var(--pink-mid, #F4A8C8);
+  opacity: 0;
+  transform: translateY(-14px) scale(0.96);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  max-width: min(90vw, 420px);
+}
+.jeci-toast.show { opacity: 1; transform: translateY(0) scale(1); }
+.jeci-toast-icon { font-size: 1.1rem; flex-shrink: 0; }
+.jeci-toast-error { border-color: #dc3545; }
+
+.jeci-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(46, 49, 66, 0.5);
+  backdrop-filter: blur(2px);
+  z-index: 2100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.jeci-modal-overlay.open { opacity: 1; }
+.jeci-modal-card {
+  background: #fff;
+  border-radius: var(--radius, 20px);
+  padding: 30px 26px;
+  max-width: 380px;
+  width: 100%;
+  text-align: center;
+  box-shadow: var(--shadow-soft, 0 20px 40px -12px rgba(46,49,66,0.4));
+  transform: scale(0.94);
+  transition: transform 0.2s ease;
+}
+.jeci-modal-overlay.open .jeci-modal-card { transform: scale(1); }
+.jeci-modal-msg {
+  font-family: var(--font-display, sans-serif);
+  font-weight: 600;
+  color: var(--ink, #2A2838);
+  font-size: 1.05rem;
+  margin: 0 0 22px;
+}
+.jeci-modal-actions { display: flex; gap: 10px; justify-content: center; }
+.jeci-modal-actions .btn { flex: 1; }
+
+.founder-note {
+  position: relative;
+  background: var(--cream, #FFF8FA);
+  border: 1.5px dashed var(--pink-mid, #F4A8C8);
+  border-radius: 18px;
+  padding: 28px 30px 24px;
+  margin-top: 28px;
+  text-align: left;
+}
+.founder-note::before {
+  content: "✉";
+  position: absolute;
+  top: -16px;
+  left: 26px;
+  background: var(--pink-deep, #E34988);
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  box-shadow: 0 6px 14px -4px rgba(227, 73, 136, 0.5);
+}
+.founder-note p {
+  font-size: 0.96rem;
+  color: var(--body-gray, #5F5B73);
+  margin: 6px 0 16px;
+}
+.founder-signature {
+  display: block;
+  font-family: var(--font-script, cursive);
+  font-size: 1.9rem;
+  color: var(--pink-deep, #E34988);
+  line-height: 1;
+}
+.founder-role {
+  display: block;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--body-gray, #5F5B73);
+  margin-top: 2px;
+}
+
+.testi-card.polaroid { transform: rotate(-1.4deg); }
+.testi-card.polaroid:nth-child(2) { transform: rotate(1.2deg); }
+.testi-card.polaroid:nth-child(3) { transform: rotate(-0.6deg); }
+.testi-card.polaroid:hover { transform: rotate(0deg) translateY(-4px); }
+
+.jeci-loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--pink-deep, #E34988);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+.jeci-loading::before {
+  content: "🦋";
+  display: inline-block;
+  animation: jeciLoadingFloat 1.1s ease-in-out infinite;
+}
+@keyframes jeciLoadingFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-4px) rotate(-8deg); }
+}

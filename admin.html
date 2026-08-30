@@ -4,15 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Painel Administrativo | Jeci Store</title>
+<meta name="robots" content="noindex, nofollow">
 
 <link rel="icon" type="image/png" href="logo.png">
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="personality.css">
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
+<script src="jeci-ui.js"></script>
+
 <style>
   body { background: var(--cream); padding: 30px 0; min-height: 100vh; }
   .admin-wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
@@ -23,7 +28,7 @@
   }
   .auth-card {
     background: var(--paper); border-radius: var(--radius-lg); padding: 40px 32px;
-    max-width: 400px; width: 100%; box-shadow: var(--shadow-soft);
+    max-width: 420px; width: 100%; box-shadow: var(--shadow-soft);
     border: 1.5px solid rgba(227,73,136,0.18); text-align: center;
   }
   .auth-error { color: #dc3545; font-size: 0.88rem; font-weight: 700; margin-top: 12px; display: none; }
@@ -99,11 +104,12 @@
   <div class="auth-card">
     <img src="logo.png" alt="Logo" class="brand-logo-img cute-bounce" style="width:70px; height:70px; margin:0 auto 14px;">
     <h2>Painel da Loja</h2>
-    <p>Digite a senha administrativa da Jeci Store:</p>
+    <p>Acesse com seu e-mail e senha cadastrados:</p>
     <form id="authForm">
-      <input type="password" id="adminPass" placeholder="••••••••" required style="width: 100%; margin-bottom: 14px; padding: 12px; text-align: center;">
-      <button type="submit" class="btn btn-whatsapp btn-block">Entrar no Painel</button>
-      <p class="auth-error" id="authError">Senha incorreta. Tente novamente.</p>
+      <input type="email" id="adminEmail" placeholder="seu-email@loja.com" required style="width: 100%; margin-bottom: 10px; padding: 12px;">
+      <input type="password" id="adminPass" placeholder="••••••••" required style="width: 100%; margin-bottom: 14px; padding: 12px;">
+      <button type="submit" class="btn btn-whatsapp btn-block" id="btnSubmitLogin">Entrar no Painel</button>
+      <p class="auth-error" id="authError">E-mail ou senha incorretos.</p>
     </form>
   </div>
 </div>
@@ -114,7 +120,7 @@
       <img src="logo.png" alt="Logo" class="brand-logo-img">
       <div>
         <h1 style="margin:0; font-size:1.6rem;">Painel de Controle</h1>
-        <p style="margin:0;">Gerencie calçados e modere avaliações reais</p>
+        <p style="margin:0; font-size:0.85rem;" id="loggedUserDisplay">Conectado com segurança</p>
       </div>
     </div>
     <div style="display:flex; gap:10px; flex-wrap:wrap;">
@@ -303,7 +309,6 @@
 
 <script>
 (function() {
-  const ADMIN_PASSWORD = "jeci2026";
   const IMGBB_API_KEY = "f230f2d81c42c92ba630ff6178c7bf55";
 
   let products = [];
@@ -322,26 +327,46 @@
     if (tabId === "tab-depoimentos-loja") loadStoreReviews();
   };
 
-  function checkSession() {
-    if (sessionStorage.getItem("jeci_auth") === "true") {
+  async function checkSession() {
+    if (!db) return;
+    const { data: { session } } = await db.auth.getSession();
+    if (session) {
       document.getElementById("authOverlay").style.display = "none";
       document.getElementById("adminContent").style.display = "block";
+      document.getElementById("loggedUserDisplay").textContent = `Conectado como: ${session.user.email}`;
       initAdmin();
+    } else {
+      document.getElementById("authOverlay").style.display = "flex";
+      document.getElementById("adminContent").style.display = "none";
     }
   }
 
-  document.getElementById("authForm").addEventListener("submit", function(e) {
+  document.getElementById("authForm").addEventListener("submit", async function(e) {
     e.preventDefault();
-    if (document.getElementById("adminPass").value.trim() === ADMIN_PASSWORD) {
-      sessionStorage.setItem("jeci_auth", "true");
-      checkSession();
+    const email = document.getElementById("adminEmail").value.trim();
+    const password = document.getElementById("adminPass").value;
+    const btn = document.getElementById("btnSubmitLogin");
+    const errEl = document.getElementById("authError");
+
+    btn.disabled = true;
+    btn.textContent = "Verificando...";
+    errEl.style.display = "none";
+
+    const { data, error } = await db.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      errEl.textContent = "E-mail ou senha incorretos.";
+      errEl.style.display = "block";
+      btn.disabled = false;
+      btn.textContent = "Entrar no Painel";
     } else {
-      document.getElementById("authError").style.display = "block";
+      btn.textContent = "Entrando...";
+      checkSession();
     }
   });
 
-  document.getElementById("btnLogout").addEventListener("click", () => {
-    sessionStorage.removeItem("jeci_auth");
+  document.getElementById("btnLogout").addEventListener("click", async () => {
+    if (db) await db.auth.signOut();
     window.location.reload();
   });
 
@@ -392,7 +417,7 @@
         throw new Error(d.error.message);
       }
     } catch (err) {
-      alert("Erro no upload: " + err.message);
+      JeciUI.toast("Erro no upload: " + err.message, { type: "error" });
       statusEl.textContent = "❌ Falha no upload.";
     }
   });
@@ -403,9 +428,9 @@
     products.forEach((p, idx) => {
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td><img src="${p.imagem}" class="preview-thumb"></td>
-        <td><strong>${p.codigo}</strong></td>
-        <td>${p.nome}</td>
+        <td><img src="${JeciUI.escapeHtml(p.imagem)}" class="preview-thumb"></td>
+        <td><strong>${JeciUI.escapeHtml(p.codigo)}</strong></td>
+        <td>${JeciUI.escapeHtml(p.nome)}</td>
         <td>R$ ${Number(p.preco).toFixed(2).replace('.', ',')}</td>
         <td>
           <button class="status-btn ${p.ativo ? 'active' : 'inactive'}" onclick="window.toggleStatus(${idx})">
@@ -414,7 +439,7 @@
         </td>
         <td>
           <button class="btn btn-outline btn-sm" onclick="window.editProduct(${idx})">Editar</button>
-          <button class="btn btn-outline btn-sm" style="color:#dc3545; border-color:#dc3545;" onclick="window.deleteProduct('${p.id}', ${idx})">Excluir</button>
+          <button class="btn btn-outline btn-sm" style="color:#dc3545; border-color:#dc3545;" onclick="window.deleteProduct('${JeciUI.escapeHtml(p.id)}', ${idx})">Excluir</button>
         </td>
       `;
       tbody.appendChild(tr);
@@ -466,15 +491,17 @@
   };
 
   window.deleteProduct = async function(id, idx) {
-    if (confirm("Deseja realmente excluir este calçado e todas as suas avaliações?")) {
-      if (db) {
-        await db.from("produtos").delete().eq("id", id);
-      }
-      products.splice(idx, 1);
-      localStorage.setItem("jeci_produtos", JSON.stringify(products));
-      renderProductsTable();
-      loadProductReviews();
+    const confirmed = await JeciUI.confirmDialog("Deseja realmente excluir este calçado e todas as suas avaliações?");
+    if (!confirmed) return;
+    
+    if (db) {
+      await db.from("produtos").delete().eq("id", id);
     }
+    products.splice(idx, 1);
+    localStorage.setItem("jeci_produtos", JSON.stringify(products));
+    renderProductsTable();
+    loadProductReviews();
+    JeciUI.toast("Calçado excluído com sucesso.");
   };
 
   document.getElementById("productForm").addEventListener("submit", async function(e) {
@@ -509,7 +536,7 @@
     localStorage.setItem("jeci_produtos", JSON.stringify(products));
     renderProductsTable();
     window.resetAdminForm();
-    alert("Calçado salvo com sucesso!");
+    JeciUI.toast("Calçado salvo no catálogo! 🦋");
   });
 
   /* 2. AVALIAÇÕES DOS PRODUTOS */
@@ -533,13 +560,13 @@
       const dataStr = r.created_at ? new Date(r.created_at).toLocaleDateString('pt-BR') : "Recente";
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td><strong>${prodName}</strong></td>
-        <td>${r.nome_cliente}</td>
+        <td><strong>${JeciUI.escapeHtml(prodName)}</strong></td>
+        <td>${JeciUI.escapeHtml(r.nome_cliente)}</td>
         <td><span class="rating-stars">${"★".repeat(r.estrelas)}</span></td>
-        <td><em>"${r.comentario || 'Sem comentário'}"</em></td>
+        <td><em>"${JeciUI.escapeHtml(r.comentario || 'Sem comentário')}"</em></td>
         <td><small>${dataStr}</small></td>
         <td>
-          <button class="btn btn-outline btn-sm btn-delete-rev" onclick="window.deleteProductReview('${r.id}')">Excluir</button>
+          <button class="btn btn-outline btn-sm btn-delete-rev" onclick="window.deleteProductReview('${JeciUI.escapeHtml(r.id)}')">Excluir</button>
         </td>
       `;
       tbody.appendChild(tr);
@@ -547,12 +574,14 @@
   };
 
   window.deleteProductReview = async function(reviewId) {
-    if (confirm("Excluir esta avaliação de produto?")) {
-      if (db) {
-        await db.from("avaliacoes_produtos").delete().eq("id", reviewId);
-      }
-      loadProductReviews();
+    const confirmed = await JeciUI.confirmDialog("Excluir esta avaliação de produto?");
+    if (!confirmed) return;
+    
+    if (db) {
+      await db.from("avaliacoes_produtos").delete().eq("id", reviewId);
     }
+    loadProductReviews();
+    JeciUI.toast("Avaliação removida.");
   };
 
   /* 3. DEPOIMENTOS DA LOJA */
@@ -574,13 +603,13 @@
     storeReviews.forEach(r => {
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td><strong>${r.nome}</strong></td>
-        <td>${r.cidade || '—'}</td>
+        <td><strong>${JeciUI.escapeHtml(r.nome)}</strong></td>
+        <td>${JeciUI.escapeHtml(r.cidade || '—')}</td>
         <td><span class="rating-stars">${"★".repeat(r.estrelas || 5)}</span></td>
-        <td>"${r.comentario}"</td>
-        <td><span class="stat-badge">${r.tag || 'Depoimento'}</span></td>
+        <td>"${JeciUI.escapeHtml(r.comentario)}"</td>
+        <td><span class="stat-badge">${JeciUI.escapeHtml(r.tag || 'Depoimento')}</span></td>
         <td>
-          <button class="btn btn-outline btn-sm btn-delete-rev" onclick="window.deleteStoreReview('${r.id}')">Excluir</button>
+          <button class="btn btn-outline btn-sm btn-delete-rev" onclick="window.deleteStoreReview('${JeciUI.escapeHtml(r.id)}')">Excluir</button>
         </td>
       `;
       tbody.appendChild(tr);
@@ -588,12 +617,14 @@
   };
 
   window.deleteStoreReview = async function(reviewId) {
-    if (confirm("Excluir este depoimento da loja?")) {
-      if (db) {
-        await db.from("depoimentos_loja").delete().eq("id", reviewId);
-      }
-      loadStoreReviews();
+    const confirmed = await JeciUI.confirmDialog("Excluir este depoimento da loja?");
+    if (!confirmed) return;
+
+    if (db) {
+      await db.from("depoimentos_loja").delete().eq("id", reviewId);
     }
+    loadStoreReviews();
+    JeciUI.toast("Depoimento excluído.");
   };
 
   document.getElementById("btnExport").addEventListener("click", function() {

@@ -1,8 +1,6 @@
 (function () {
   "use strict";
 
-  const WHATSAPP_NUMBER = "5586981247491";
-
   const DEFAULT_REVIEWS = [
     {
       nome: "xdecora.paper",
@@ -21,16 +19,18 @@
     return { inteiro: parts[0], centavos: parts[1] };
   }
 
-  function getWhatsappLink(message) {
-    return "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(message);
-  }
-
   function renderStars(rating) {
     const full = Math.round(rating);
     return "★".repeat(full) + "☆".repeat(5 - full);
   }
 
-  /* MENU MOBILE */
+  function updateCartBadge() {
+    const cart = JSON.parse(localStorage.getItem("jeci_cart") || "[]");
+    const count = cart.reduce((s, i) => s + i.qtd, 0);
+    const badge = document.getElementById("headerCartBadge");
+    if (badge) badge.textContent = count;
+  }
+
   function setupMobileMenu() {
     const toggle = document.getElementById("navToggle");
     const nav = document.getElementById("mainNav");
@@ -57,7 +57,6 @@
     });
   }
 
-  /* RENDERIZAÇÃO DOS PRODUTOS NA HOME */
   function renderProducts(list) {
     const grid = document.getElementById("productGrid");
     if (!grid) return;
@@ -77,30 +76,23 @@
       if (totalRatings > 0) {
         const avg = evals.reduce((sum, e) => sum + e.estrelas, 0) / totalRatings;
         ratingMarkup = `
-          <a href="produto.html?id=${prod.id}" class="product-rating-bar" title="Ver avaliações">
+          <a href="produto.html?id=${encodeURIComponent(prod.id)}" class="product-rating-bar" title="Ver avaliações">
             <span class="stars-val">${renderStars(avg)}</span>
             <span class="rating-count">(${totalRatings}) Ver detalhes →</span>
           </a>
         `;
       } else {
         ratingMarkup = `
-          <a href="produto.html?id=${prod.id}" class="product-rating-bar">
+          <a href="produto.html?id=${encodeURIComponent(prod.id)}" class="product-rating-bar">
             <span class="rating-count" style="color:var(--body-gray); font-weight:600;">✨ Novo Modelo &middot; Avaliar</span>
           </a>
         `;
       }
 
-      const msg = `Olá! Tenho interesse no calçado:\n\n` +
-        `* Código: ${prod.codigo}\n` +
-        `* Modelo: ${prod.nome}\n` +
-        `* Preço: R$ ${Number(prod.preco).toFixed(2)}\n` +
-        `* Foto: ${prod.imagem}\n\n` +
-        `Gostaria de saber a disponibilidade no meu número.`;
-
       article.innerHTML = `
         <div class="product-art-wrapper">
-          <a href="produto.html?id=${prod.id}">
-            <img src="${prod.imagem}" alt="${prod.nome}" class="product-img" loading="lazy">
+          <a href="produto.html?id=${encodeURIComponent(prod.id)}">
+            <img src="${JeciUI.escapeHtml(prod.imagem)}" alt="${JeciUI.escapeHtml(prod.nome)}" class="product-img" loading="lazy">
           </a>
         </div>
         <div class="swing-tag product-tag">
@@ -109,14 +101,14 @@
         
         ${ratingMarkup}
 
-        <span class="product-code-badge">${prod.codigo}</span>
-        <h3><a href="produto.html?id=${prod.id}">${prod.nome}</a></h3>
-        <p class="product-desc">${prod.descricao || ""}</p>
-        <p class="product-sizes-badge">Numerações: ${(Array.isArray(prod.tamanhos) ? prod.tamanhos : []).join(", ") || "34 ao 39"}</p>
+        <span class="product-code-badge">${JeciUI.escapeHtml(prod.codigo)}</span>
+        <h3><a href="produto.html?id=${encodeURIComponent(prod.id)}">${JeciUI.escapeHtml(prod.nome)}</a></h3>
+        <p class="product-desc">${JeciUI.escapeHtml(prod.descricao || "")}</p>
+        <p class="product-sizes-badge">Numerações: ${(Array.isArray(prod.tamanhos) ? prod.tamanhos : []).join(", ") || "30 ao 45"}</p>
         
         <div style="display:flex; gap:8px; margin-top:auto;">
-          <a class="btn btn-whatsapp btn-block js-whatsapp" href="${getWhatsappLink(msg)}" target="_blank" rel="noopener">Comprar</a>
-          <a class="btn btn-outline" href="produto.html?id=${prod.id}" style="padding:10px 14px;" title="Ver detalhes">🔍</a>
+          <a class="btn btn-whatsapp btn-block" href="produto.html?id=${encodeURIComponent(prod.id)}">Comprar / Detalhes</a>
+          <a class="btn btn-outline" href="produto.html?id=${encodeURIComponent(prod.id)}" style="padding:10px 14px;" title="Ver detalhes">🔍</a>
         </div>
       `;
 
@@ -126,7 +118,6 @@
     setupScrollReveal();
   }
 
-  /* RENDERIZAÇÃO DOS DEPOIMENTOS */
   function renderReviews() {
     const grid = document.getElementById("testiGrid");
     if (!grid) return;
@@ -134,13 +125,13 @@
 
     reviews.forEach(r => {
       const card = document.createElement("blockquote");
-      card.className = "testi-card";
+      card.className = "testi-card polaroid";
       card.innerHTML = `
         <div class="stars">${"★".repeat(r.estrelas || 5)}</div>
-        <p>&ldquo;${r.comentario}&rdquo;</p>
+        <p>&ldquo;${JeciUI.escapeHtml(r.comentario)}&rdquo;</p>
         <footer>
-          <strong>${r.nome}</strong> ${r.cidade ? `&middot; ${r.cidade}` : ''}
-          ${r.tag ? `<span class="review-verified">🌸 ${r.tag}</span>` : ""}
+          <strong>${JeciUI.escapeHtml(r.nome)}</strong> ${r.cidade ? `&middot; ${JeciUI.escapeHtml(r.cidade)}` : ''}
+          ${r.tag ? `<span class="review-verified">🌸 ${JeciUI.escapeHtml(r.tag)}</span>` : ""}
         </footer>
       `;
       grid.appendChild(card);
@@ -218,7 +209,7 @@
       renderReviews();
       storeForm.reset();
       updateStars(5);
-      alert("Obrigada pelo feedback! Sua avaliação foi adicionada.");
+      JeciUI.toast("Obrigada pelo feedback! 🦋");
     });
   }
 
@@ -244,6 +235,8 @@
   }
 
   document.addEventListener("DOMContentLoaded", function () {
+    JeciUI.buildWhatsappLinks();
+    updateCartBadge();
     loadInitialData();
     const yr = document.getElementById("year");
     if (yr) yr.textContent = new Date().getFullYear();

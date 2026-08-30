@@ -8,14 +8,16 @@
 <meta name="description" content="Explore todos os modelos de sandálias, rasteiras, papetes e saltos da Jeci Store. Conforto garantido.">
 
 <link rel="icon" type="image/png" href="logo.png">
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&family=Pinyon+Script&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="personality.css">
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
+<script src="jeci-ui.js"></script>
 <style>
   .catalog-hero {
     background: linear-gradient(155deg, #FFEBF2 0%, #FFDFEC 45%, #FFFFFF 90%);
@@ -72,16 +74,21 @@
 
     <nav class="main-nav" id="mainNav">
       <a href="index.html">Início</a>
-      <a href="catalogo.html" style="color: var(--pink-deep);">Catálogo de Calçados</a>
-      <a href="carrinho.html">Meu Carrinho 🛍️</a>
+      <a href="catalogo.html" style="color: var(--pink-deep);">Catálogo</a>
       <a href="index.html#depoimentos">Feedbacks</a>
     </nav>
 
     <div class="header-actions">
-      <a class="btn btn-whatsapp btn-sm" href="carrinho.html" id="catCartBtn">
-        <span>🛍️ (<span id="catCartCount">0</span>)</span>
+      <a class="header-cart-btn" href="carrinho.html" title="Ver Carrinho" aria-label="Carrinho">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <path d="M16 10a4 4 0 0 1-8 0"></path>
+        </svg>
+        <span class="cart-badge-count" id="headerCartBadge">0</span>
       </a>
-      <a class="btn btn-whatsapp btn-sm" href="https://wa.me/5586981247491" target="_blank" rel="noopener">
+
+      <a class="btn btn-whatsapp btn-sm js-whatsapp" data-msg="Olá! Gostaria de tirar uma dúvida sobre o catálogo." href="#" target="_blank" rel="noopener">
         <span>WhatsApp</span>
       </a>
       <button class="nav-toggle" id="navToggle" aria-label="Abrir menu">
@@ -96,7 +103,7 @@
     <div class="wrap">
       <p class="eyebrow cute-sparkle">Coleção Completa de Calçados ✨</p>
       <h1 class="section-title">Nossos Modelos</h1>
-      <p style="max-width: 52ch; margin: 0 auto; color: var(--body-gray);">Escolha seu calçado favorito, confira as avaliações reais e peça diretamente no WhatsApp.</p>
+      <p style="max-width: 52ch; margin: 0 auto; color: var(--body-gray);">Escolha seu calçado favorito, confira as avaliações reais e monte seu pedido no carrinho.</p>
     </div>
   </section>
 
@@ -124,7 +131,7 @@
           </select>
         </div>
 
-        <div class="catalog-counter" id="itemCount">Carregando calçados da nuvem...</div>
+        <div class="catalog-counter" id="itemCount"><span class="jeci-loading">Preparando os calçados</span></div>
       </div>
 
       <div class="product-grid" id="fullCatalogGrid"></div>
@@ -145,7 +152,7 @@
     <div class="footer-col">
       <h4>Atendimento</h4>
       <p>Loja 100% online &middot; Segunda a Sábado</p>
-      <a class="footer-whatsapp" href="https://wa.me/5586981247491" target="_blank">+55 86 98124-7491</a>
+      <a class="footer-whatsapp js-whatsapp" href="#" target="_blank" rel="noopener">+55 86 98124-7491</a>
     </div>
 
     <div class="footer-col">
@@ -166,9 +173,7 @@
 (function() {
   "use strict";
 
-  const WHATSAPP_NUMBER = "5586981247491";
   let products = [];
-
   const grid = document.getElementById("fullCatalogGrid");
   const searchInput = document.getElementById("catSearch");
   const categorySelect = document.getElementById("catCategory");
@@ -182,17 +187,13 @@
   function updateCartBadge() {
     const cart = JSON.parse(localStorage.getItem("jeci_cart") || "[]");
     const count = cart.reduce((s, i) => s + i.qtd, 0);
-    const badge = document.getElementById("catCartCount");
+    const badge = document.getElementById("headerCartBadge");
     if (badge) badge.textContent = count;
   }
 
   function formatPrice(val) {
     const parts = Number(val).toFixed(2).split(".");
     return { inteiro: parts[0], centavos: parts[1] };
-  }
-
-  function getWhatsappLink(message) {
-    return "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(message);
   }
 
   function renderStars(rating) {
@@ -247,7 +248,7 @@
         const avg = evals.reduce((s, e) => s + e.estrelas, 0) / totalRatings;
         prod.avgRating = avg;
         ratingMarkup = `
-          <a href="produto.html?id=${prod.id}" class="product-rating-bar">
+          <a href="produto.html?id=${encodeURIComponent(prod.id)}" class="product-rating-bar">
             <span class="stars-val">${renderStars(avg)}</span>
             <span class="rating-count">(${totalRatings}) Ver detalhes →</span>
           </a>
@@ -255,23 +256,16 @@
       } else {
         prod.avgRating = 0;
         ratingMarkup = `
-          <a href="produto.html?id=${prod.id}" class="product-rating-bar">
+          <a href="produto.html?id=${encodeURIComponent(prod.id)}" class="product-rating-bar">
             <span class="rating-count" style="color:var(--body-gray); font-weight:600;">✨ Novo Modelo &middot; Avaliar</span>
           </a>
         `;
       }
 
-      const msg = `Olá! Tenho interesse no calçado:\n\n` +
-        `* Código: ${prod.codigo}\n` +
-        `* Modelo: ${prod.nome}\n` +
-        `* Preço: R$ ${Number(prod.preco).toFixed(2)}\n` +
-        `* Foto: ${prod.imagem}\n\n` +
-        `Gostaria de saber a disponibilidade.`;
-
       article.innerHTML = `
         <div class="product-art-wrapper">
-          <a href="produto.html?id=${prod.id}">
-            <img src="${prod.imagem}" alt="${prod.nome}" class="product-img" loading="lazy">
+          <a href="produto.html?id=${encodeURIComponent(prod.id)}">
+            <img src="${JeciUI.escapeHtml(prod.imagem)}" alt="${JeciUI.escapeHtml(prod.nome)}" class="product-img" loading="lazy">
           </a>
         </div>
         <div class="swing-tag product-tag">
@@ -280,14 +274,14 @@
         
         ${ratingMarkup}
 
-        <span class="product-code-badge">${prod.codigo}</span>
-        <h3><a href="produto.html?id=${prod.id}">${prod.nome}</a></h3>
-        <p class="product-desc">${prod.descricao || ""}</p>
+        <span class="product-code-badge">${JeciUI.escapeHtml(prod.codigo)}</span>
+        <h3><a href="produto.html?id=${encodeURIComponent(prod.id)}">${JeciUI.escapeHtml(prod.nome)}</a></h3>
+        <p class="product-desc">${JeciUI.escapeHtml(prod.descricao || "")}</p>
         <p class="product-sizes-badge">Numerações: ${(Array.isArray(prod.tamanhos) ? prod.tamanhos : []).join(", ") || "30 ao 45"}</p>
         
         <div style="display:flex; gap:8px; margin-top:auto;">
-          <a class="btn btn-whatsapp btn-block" href="produto.html?id=${prod.id}">Comprar / Detalhes</a>
-          <a class="btn btn-outline" href="produto.html?id=${prod.id}" style="padding:10px 14px;" title="Ver detalhes">🔍</a>
+          <a class="btn btn-whatsapp btn-block" href="produto.html?id=${encodeURIComponent(prod.id)}">Comprar / Detalhes</a>
+          <a class="btn btn-outline" href="produto.html?id=${encodeURIComponent(prod.id)}" style="padding:10px 14px;" title="Ver detalhes">🔍</a>
         </div>
       `;
 
@@ -324,7 +318,6 @@
   categorySelect.addEventListener("change", renderGrid);
   sortSelect.addEventListener("change", renderGrid);
 
-  // Ativação do Menu Mobile
   const toggle = document.getElementById("navToggle");
   const nav = document.getElementById("mainNav");
   if (toggle && nav) {
@@ -349,9 +342,12 @@
     });
   }
 
-  document.getElementById("year").textContent = new Date().getFullYear();
-  updateCartBadge();
-  loadData();
+  document.addEventListener("DOMContentLoaded", function() {
+    JeciUI.buildWhatsappLinks();
+    updateCartBadge();
+    loadData();
+    document.getElementById("year").textContent = new Date().getFullYear();
+  });
 })();
 </script>
 </body>
