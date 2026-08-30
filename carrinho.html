@@ -4,12 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Meu Carrinho | Jeci Store</title>
+<meta name="robots" content="noindex, follow">
 
-<link rel="icon" type="image/jpeg" href="WhatsApp Image 2026-08-30 at 09.59.19.jpeg">
+<link rel="icon" type="image/png" href="logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&family=Pinyon+Script&display=swap" rel="stylesheet">
+
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="personality.css">
 
 <style>
   .cart-wrap { padding: 40px 0 80px; }
@@ -62,18 +65,21 @@
 <header class="site-header">
   <div class="wrap header-inner">
     <a class="brand" href="index.html">
-      <img src="WhatsApp Image 2026-08-30 at 09.59.19.jpeg" alt="Logo" class="brand-logo-img">
+      <img src="logo.png" alt="Logo" class="brand-logo-img">
       <span class="brand-name">Jeci Store</span>
     </a>
 
     <nav class="main-nav" id="mainNav">
       <a href="index.html">Início</a>
-      <a href="catalogo.html">Catálogo Completo</a>
+      <a href="catalogo.html">Catálogo</a>
       <a href="index.html#depoimentos">Feedbacks</a>
     </nav>
 
     <div class="header-actions">
       <a class="btn btn-outline btn-sm" href="catalogo.html">← Continuar Comprando</a>
+      <button class="nav-toggle" id="navToggle" aria-label="Abrir menu">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </div>
 </header>
@@ -86,15 +92,38 @@
 </main>
 
 <footer class="site-footer">
-  <div class="wrap footer-bottom" style="border:none;">
+  <div class="wrap footer-inner">
+    <div class="footer-brand">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+        <img src="logo.png" alt="Logo" class="brand-logo-img">
+        <span style="font-weight:800; font-size:1.15rem; color:#fff;">Jeci Store</span>
+      </div>
+      <p>Calçados femininos com estilo, conforto e exclusividade.</p>
+    </div>
+
+    <div class="footer-col">
+      <h4>Atendimento</h4>
+      <p>Loja 100% online &middot; Segunda a Sábado</p>
+      <a class="footer-whatsapp js-whatsapp" href="#" target="_blank" rel="noopener">+55 86 98124-7491</a>
+    </div>
+
+    <div class="footer-col">
+      <h4>Navegação</h4>
+      <a href="index.html">Início</a>
+      <a href="catalogo.html">Catálogo</a>
+      <a href="admin.html" class="admin-discreet-link">Área Admin 🔒</a>
+    </div>
+  </div>
+
+  <div class="wrap footer-bottom">
     <p>&copy; <span id="year"></span> Jeci Store. Todos os direitos reservados.</p>
   </div>
 </footer>
 
+<script src="jeci-ui.js"></script>
 <script>
 (function() {
   "use strict";
-  const WHATSAPP_NUMBER = "5586981247491";
   let cart = JSON.parse(localStorage.getItem("jeci_cart") || "[]");
 
   function saveCart() {
@@ -123,12 +152,12 @@
 
       return `
         <div class="cart-item">
-          <img src="${item.imagem}" alt="${item.nome}" class="cart-item-img">
+          <img src="${JeciUI.escapeHtml(item.imagem)}" alt="${JeciUI.escapeHtml(item.nome)}" class="cart-item-img">
           <div class="cart-item-details">
-            <span class="product-code-badge">${item.codigo}</span>
-            <h4>${item.nome}</h4>
+            <span class="product-code-badge">${JeciUI.escapeHtml(item.codigo)}</span>
+            <h4>${JeciUI.escapeHtml(item.nome)}</h4>
             <div class="cart-item-meta">
-              <span>Tamanho: <strong>${item.tamanho}</strong></span> &middot; 
+              <span>Tamanho: <strong>${JeciUI.escapeHtml(item.tamanho)}</strong></span> &middot; 
               <span>Unitário: R$ ${Number(item.preco).toFixed(2).replace('.', ',')}</span>
             </div>
             <div class="qty-control">
@@ -173,7 +202,7 @@
             Finalizar Pedido no WhatsApp 💬
           </button>
           <p style="font-size:0.8rem; text-align:center; color:var(--body-gray); margin-top:12px;">
-            ✿ Pagamento via Pix ou Cartão em até 6x.<br>Atendimento personalizado direto com a loja.
+            ✿ Pagamento via Pix ou Cartão.<br>Atendimento personalizado direto com a loja.
           </p>
         </div>
       </div>
@@ -195,10 +224,12 @@
     saveCart();
   };
 
-  window.clearCart = function() {
-    if (confirm("Deseja esvaziar todo o seu carrinho?")) {
+  window.clearCart = async function() {
+    const confirmed = await JeciUI.confirmDialog("Deseja esvaziar todo o seu carrinho?");
+    if (confirmed) {
       cart = [];
       saveCart();
+      JeciUI.toast("Carrinho esvaziado.");
     }
   };
 
@@ -220,11 +251,24 @@
                 `💰 *VALOR TOTAL:* R$ ${subtotal.toFixed(2).replace('.', ',')}\n\n` +
                 `Gostaria de combinar a entrega e o pagamento!`;
 
-    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, "_blank");
+    window.open(JeciUI.waLink(msg), "_blank");
   };
 
-  document.getElementById("year").textContent = new Date().getFullYear();
-  renderCart();
+  const toggle = document.getElementById("navToggle");
+  const nav = document.getElementById("mainNav");
+  if (toggle && nav) {
+    toggle.addEventListener("click", function (e) {
+      e.stopPropagation();
+      nav.classList.toggle("open");
+      toggle.classList.toggle("active");
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", function() {
+    JeciUI.buildWhatsappLinks();
+    renderCart();
+    document.getElementById("year").textContent = new Date().getFullYear();
+  });
 })();
 </script>
 </body>

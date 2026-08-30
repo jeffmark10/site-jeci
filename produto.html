@@ -12,8 +12,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&family=Pinyon+Script&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="personality.css">
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
+<script src="jeci-ui.js"></script>
+
 <style>
   .product-info-panel h1 { font-size: 2.1rem; margin-bottom: 6px; }
   .product-info-price { font-size: 2rem; font-weight: 800; color: var(--pink-deep); margin-bottom: 18px; font-family: var(--font-display); }
@@ -56,13 +60,22 @@
     </a>
     <nav class="main-nav" id="mainNav">
       <a href="index.html">Início</a>
-      <a href="catalogo.html">Catálogo Completo</a>
-      <a href="carrinho.html">Meu Carrinho 🛍️</a>
+      <a href="catalogo.html">Catálogo</a>
+      <a href="index.html#depoimentos">Feedbacks</a>
     </nav>
     <div class="header-actions">
-      <a class="btn btn-whatsapp btn-sm" href="carrinho.html" id="headerCartBtn">
-        <span>🛍️ Carrinho (<span id="cartCountBadge">0</span>)</span>
+      <a class="header-cart-btn" href="carrinho.html" title="Ver Carrinho de Compras" aria-label="Carrinho">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <path d="M16 10a4 4 0 0 1-8 0"></path>
+        </svg>
+        <span class="cart-badge-count" id="headerCartBadge">0</span>
       </a>
+      <a class="btn btn-outline btn-sm" href="catalogo.html">← Voltar</a>
+      <button class="nav-toggle" id="navToggle" aria-label="Abrir menu">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </div>
 </header>
@@ -130,14 +143,38 @@
       </form>
 
       <div class="reviews-list" id="productReviewsList">
-        <p style="color:var(--body-gray); font-size:0.9rem;">Carregando avaliações...</p>
+        <p style="color:var(--body-gray); font-size:0.9rem;"><span class="jeci-loading">Carregando avaliações</span></p>
       </div>
     </div>
   </section>
 </main>
 
 <footer class="site-footer">
-  <div class="wrap footer-bottom" style="border:none;">
+  <div class="wrap footer-inner">
+    <div class="footer-brand">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+        <img src="logo.png" alt="Logo" class="brand-logo-img">
+        <span style="font-weight:800; font-size:1.15rem; color:#fff;">Jeci Store</span>
+      </div>
+      <p>Calçados femininos com estilo, conforto e exclusividade.</p>
+    </div>
+
+    <div class="footer-col">
+      <h4>Atendimento</h4>
+      <p>Loja 100% online &middot; Segunda a Sábado</p>
+      <a class="footer-whatsapp js-whatsapp" href="#" target="_blank" rel="noopener">+55 86 98124-7491</a>
+    </div>
+
+    <div class="footer-col">
+      <h4>Navegação</h4>
+      <a href="index.html">Início</a>
+      <a href="catalogo.html">Catálogo</a>
+      <a href="carrinho.html">Meu Carrinho</a>
+      <a href="admin.html" class="admin-discreet-link">Área Admin 🔒</a>
+    </div>
+  </div>
+
+  <div class="wrap footer-bottom">
     <p>&copy; <span id="year"></span> Jeci Store. Todos os direitos reservados.</p>
   </div>
 </footer>
@@ -157,7 +194,7 @@
   function updateCartBadge() {
     const cart = JSON.parse(localStorage.getItem("jeci_cart") || "[]");
     const count = cart.reduce((s, i) => s + i.qtd, 0);
-    const badge = document.getElementById("cartCountBadge");
+    const badge = document.getElementById("headerCartBadge");
     if (badge) badge.textContent = count;
   }
 
@@ -179,14 +216,14 @@
     }
 
     if (!prod) {
-      alert("Calçado não encontrado!");
-      window.location.href = "catalogo.html";
+      JeciUI.toast("Calçado não encontrado.", { type: "error" });
+      setTimeout(() => { window.location.href = "catalogo.html"; }, 1000);
       return;
     }
 
     currentProduct = prod;
     document.title = `${prod.nome} | Jeci Store`;
-    document.getElementById("prodImage").src = prod.imagem;
+    document.getElementById("prodImage").src = JeciUI.escapeHtml(prod.imagem);
     document.getElementById("prodCode").textContent = prod.codigo;
     document.getElementById("prodName").textContent = prod.nome;
     document.getElementById("prodPrice").textContent = `R$ ${Number(prod.preco).toFixed(2).replace('.', ',')}`;
@@ -227,9 +264,9 @@
   });
 
   // Adicionar ao Carrinho
-  document.getElementById("btnAddToCart").addEventListener("click", () => {
+  document.getElementById("btnAddToCart").addEventListener("click", async () => {
     if (!selectedSize) {
-      alert("Por favor, selecione uma numeração!");
+      JeciUI.toast("Selecione uma numeração antes de continuar.", { type: "error" });
       return;
     }
 
@@ -253,9 +290,11 @@
     localStorage.setItem("jeci_cart", JSON.stringify(cart));
     updateCartBadge();
     
-    if (confirm(`✅ ${selectedQuantity}x ${currentProduct.nome} (Nº ${selectedSize}) adicionado ao carrinho!\n\nDeseja ir para o carrinho agora?`)) {
-      window.location.href = "carrinho.html";
-    }
+    const irAoCarrinho = await JeciUI.confirmDialog(
+      `${selectedQuantity}x ${currentProduct.nome} (Nº ${selectedSize}) adicionado ao carrinho!`,
+      { okLabel: "Ver carrinho", cancelLabel: "Continuar vendo" }
+    );
+    if (irAoCarrinho) window.location.href = "carrinho.html";
   });
 
   async function loadReviews() {
@@ -290,8 +329,8 @@
       card.className = "review-item-card";
       card.innerHTML = `
         <div style="color:var(--gold); font-size:0.95rem; margin-bottom:4px;">${"★".repeat(r.estrelas)}</div>
-        <p style="margin:0 0 6px; font-weight:600; color:var(--ink);">${r.comentario || 'Avaliação sem texto'}</p>
-        <span style="font-size:0.8rem; color:var(--body-gray);">Por <strong>${r.nome_cliente || 'Cliente'}</strong></span>
+        <p style="margin:0 0 6px; font-weight:600; color:var(--ink);">${JeciUI.escapeHtml(r.comentario || 'Avaliação sem texto')}</p>
+        <span style="font-size:0.8rem; color:var(--body-gray);">Por <strong>${JeciUI.escapeHtml(r.nome_cliente || 'Cliente')}</strong></span>
       `;
       listEl.appendChild(card);
     });
@@ -330,13 +369,26 @@
 
     this.reset();
     setStars(5);
-    alert("Obrigada! Sua avaliação foi cadastrada com sucesso.");
+    JeciUI.toast("Obrigada! Sua avaliação foi cadastrada. 🦋");
     loadReviews();
   });
 
-  document.getElementById("year").textContent = new Date().getFullYear();
-  updateCartBadge();
-  loadProduct();
+  const toggle = document.getElementById("navToggle");
+  const nav = document.getElementById("mainNav");
+  if (toggle && nav) {
+    toggle.addEventListener("click", function (e) {
+      e.stopPropagation();
+      nav.classList.toggle("open");
+      toggle.classList.toggle("active");
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", function() {
+    JeciUI.buildWhatsappLinks();
+    updateCartBadge();
+    loadProduct();
+    document.getElementById("year").textContent = new Date().getFullYear();
+  });
 })();
 </script>
 </body>
