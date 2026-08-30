@@ -223,7 +223,7 @@
 
     currentProduct = prod;
     document.title = `${prod.nome} | Jeci Store`;
-    document.getElementById("prodImage").src = JeciUI.escapeHtml(prod.imagem);
+    document.getElementById("prodImage").src = prod.imagem;
     document.getElementById("prodCode").textContent = prod.codigo;
     document.getElementById("prodName").textContent = prod.nome;
     document.getElementById("prodPrice").textContent = `R$ ${Number(prod.preco).toFixed(2).replace('.', ',')}`;
@@ -380,6 +380,20 @@
       e.stopPropagation();
       nav.classList.toggle("open");
       toggle.classList.toggle("active");
+    });
+
+    document.querySelectorAll(".main-nav a").forEach(link => {
+      link.addEventListener("click", () => {
+        nav.classList.remove("open");
+        toggle.classList.remove("active");
+      });
+    });
+
+    document.addEventListener("click", function(e) {
+      if (!nav.contains(e.target) && !toggle.contains(e.target)) {
+        nav.classList.remove("open");
+        toggle.classList.remove("active");
+      }
     });
   }
 

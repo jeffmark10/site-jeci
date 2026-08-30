@@ -66,9 +66,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; color: var(
 .section-alt { background: var(--cream); }
 .center { text-align: center; }
 
-/* =========================================================
-   ANIMAÇÕES & MICROINTERAÇÕES
-   ========================================================= */
+/* Microinterações */
 .cute-bounce {
   display: inline-block;
   animation: cuteBounce 3.2s ease-in-out infinite;
@@ -98,9 +96,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; color: var(
   50% { transform: translateY(-14px) rotate(-8deg); }
 }
 
-/* =========================================================
-   BUTTONS
-   ========================================================= */
+/* Botões */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -141,52 +137,90 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; color: var(
 }
 .btn-outline:hover { background: var(--pink-deep); color: #fff; border-color: var(--pink-deep); }
 
-/* =========================================================
-   HEADER & LOGO
-   ========================================================= */
+/* Header, Logo & Carrinho */
 .site-header {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(227, 73, 136, 0.12);
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1.5px solid rgba(227, 73, 136, 0.14);
+  box-shadow: 0 4px 20px -8px rgba(227, 73, 136, 0.12);
   transition: all 0.3s ease;
 }
 .header-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 24px;
+  padding: 10px 24px;
+  gap: 20px;
 }
-.brand { display: flex; align-items: center; gap: 10px; color: var(--pink-deep); }
+.brand { display: flex; align-items: center; gap: 12px; text-decoration: none; flex-shrink: 0; }
 .brand-logo-img {
-  width: 44px;
-  height: 44px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
   object-fit: cover;
-  box-shadow: 0 4px 12px rgba(227, 73, 136, 0.25);
-  border: 1.5px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 14px rgba(227, 73, 136, 0.3);
+  border: 2px solid #FFFFFF;
+  transition: transform 0.3s ease;
 }
-.brand-name { font-family: var(--font-display); font-weight: 800; font-size: 1.15rem; color: var(--ink); letter-spacing: -0.02em; }
+.brand:hover .brand-logo-img { transform: scale(1.06) rotate(4deg); }
+.brand-name { font-family: var(--font-display); font-weight: 800; font-size: 1.22rem; color: var(--ink); letter-spacing: -0.02em; }
 
-.main-nav { display: flex; gap: 26px; font-size: 0.92rem; font-weight: 700; }
-.main-nav a { color: var(--body-gray); transition: color 0.2s; position: relative; }
+.main-nav { display: flex; align-items: center; gap: 28px; font-size: 0.94rem; font-weight: 700; }
+.main-nav a { color: var(--body-gray); transition: color 0.2s ease; position: relative; padding: 4px 0; white-space: nowrap; }
 .main-nav a:hover { color: var(--pink-deep); }
 .main-nav a::after {
   content: "";
   position: absolute;
-  bottom: -4px;
-  left: 0;
+  bottom: 0;
+  left: 50%;
   width: 0;
   height: 2px;
   background: var(--pink-deep);
-  transition: width 0.25s ease;
+  transition: width 0.25s ease, left 0.25s ease;
   border-radius: 2px;
 }
-.main-nav a:hover::after { width: 100%; }
+.main-nav a:hover::after { width: 100%; left: 0; }
 
-.header-actions { display: flex; align-items: center; gap: 14px; }
+.header-actions { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+
+/* Botão de Carrinho com Badge */
+.header-cart-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--cream);
+  border: 1.5px solid rgba(227, 73, 136, 0.18);
+  color: var(--pink-deep);
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+.header-cart-btn:hover { background: var(--pink-light); transform: translateY(-2px); }
+
+.cart-badge-count {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--pink-deep);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  box-shadow: 0 0 0 2px #fff;
+}
 
 /* Menu Hambúrguer */
 .nav-toggle {
@@ -216,9 +250,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; color: var(
 .nav-toggle.active span:nth-child(2) { opacity: 0; }
 .nav-toggle.active span:nth-child(3) { transform: translateY(-7.5px) rotate(-45deg); }
 
-/* =========================================================
-   HERO
-   ========================================================= */
+/* Hero */
 .hero {
   background: linear-gradient(155deg, #FFEBF2 0%, #FFDFEC 45%, #FFFFFF 90%);
   position: relative;
@@ -265,9 +297,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; color: var(
 .tag-price { display: block; font-weight: 800; font-size: 1.35rem; color: var(--pink-deep); }
 .tag-price sup { font-size: 0.65rem; top: -0.6em; }
 
-/* =========================================================
-   CATEGORIAS
-   ========================================================= */
+/* Categorias */
 .cat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
 .cat-card {
   background: var(--paper);
@@ -287,9 +317,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; color: var(
 .cat-name { display: block; font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; color: var(--ink); }
 .cat-cta { display: block; font-size: 0.8rem; font-weight: 800; color: var(--pink-deep); margin-top: 6px; }
 
-/* =========================================================
-   CARDS DE PRODUTOS & VITRINE
-   ========================================================= */
+/* Cards de Calçados */
 .product-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
 .product-card {
   position: relative;
@@ -349,9 +377,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; color: var(
 .product-sizes-badge { font-size: 0.8rem; font-weight: 700; color: var(--body-gray); margin: 0 0 14px; }
 .product-desc { font-size: 0.86rem; color: var(--body-gray); margin: 0 0 12px; line-height: 1.5; flex-grow: 1; }
 
-/* =========================================================
-   DEPOIMENTOS & AVALIAÇÕES
-   ========================================================= */
+/* Depoimentos */
 .testi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-bottom: 40px; }
 .testi-card {
   background: var(--paper);
@@ -415,15 +441,40 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; color: var(
 .star-rating-selector span:hover { transform: scale(1.18); }
 .star-rating-selector span.active { color: #FBBF24; }
 
-/* =========================================================
-   FOOTER & WHATSAPP
-   ========================================================= */
+/* Página de Produto */
+.product-details-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 36px;
+  align-items: start;
+}
+
+.product-gallery-card {
+  width: 100%;
+  background: var(--paper);
+  border-radius: var(--radius);
+  padding: 16px;
+  border: 1.5px solid rgba(227, 73, 136, 0.15);
+  box-shadow: var(--shadow-soft);
+  position: relative;
+  overflow: hidden;
+}
+
+.product-gallery-card img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  border-radius: 14px;
+  object-fit: cover;
+  display: block;
+}
+
+/* Rodapé */
 .about-card { background: var(--paper); border-radius: var(--radius-lg); padding: 40px; box-shadow: var(--shadow-soft); border: 1.5px solid rgba(227, 73, 136, 0.12); }
 .about-signature { color: var(--pink-deep); font-weight: 800; margin-top: 16px; font-size: 1.05rem; }
 
 .site-footer { background: var(--ink); color: rgba(255,255,255,0.75); padding: 56px 0 24px; }
 .footer-inner { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 36px; margin-bottom: 34px; }
-.footer-brand .brand-script { color: var(--pink-mid); }
 .footer-col h4 { color: #fff; margin-bottom: 14px; font-size: 1.05rem; }
 .footer-whatsapp { font-weight: 800; color: var(--pink-mid) !important; }
 .admin-discreet-link { opacity: 0.4; font-size: 0.78rem; margin-top: 10px; display: block; }
@@ -460,23 +511,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; color: var(
 .reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.6s ease, transform 0.6s ease; }
 .reveal.in-view { opacity: 1; transform: translateY(0); }
 
-/* =========================================================
-   MODAL DE AVALIAÇÃO
-   ========================================================= */
-.modal-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000;
-  display: none; align-items: center; justify-content: center; padding: 20px;
-}
-.modal-overlay.open { display: flex; }
-.modal-card {
-  background: #fff; padding: 28px; border-radius: var(--radius); max-width: 360px;
-  width: 100%; text-align: center; position: relative; box-shadow: var(--shadow-soft);
-}
-.modal-close { position: absolute; top: 12px; right: 14px; font-size: 1.4rem; color: var(--body-gray); }
-
-/* =========================================================
-   BREAKPOINTS RESPONSIVOS (MOBILE OPTIMIZATIONS)
-   ========================================================= */
+/* Breakpoints Responsivos */
 @media (max-width: 980px) {
   .hero-inner { grid-template-columns: 1fr; padding: 40px 20px 60px; text-align: center; }
   .hero-art { order: -1; min-height: 240px; }
@@ -506,6 +541,16 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; color: var(
   .main-nav.open { display: flex; animation: fadeInMenu 0.25s ease forwards; }
   .nav-toggle { display: flex; }
 
+  .product-details-wrap {
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
+  }
+  
+  .product-gallery-card {
+    max-width: 420px;
+    margin: 0 auto;
+  }
+
   /* Admin Mobile */
   .form-grid { grid-template-columns: 1fr !important; }
   .form-group.full { grid-column: span 1 !important; }
@@ -517,54 +562,10 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; color: var(
 @media (max-width: 500px) {
   .cat-grid, .product-grid { grid-template-columns: 1fr; }
   .review-inputs { grid-template-columns: 1fr; }
-  .product-details-wrap { grid-template-columns: 1fr; }
   .hero-copy h1 { font-size: 2.1rem; }
 }
 
 @keyframes fadeInMenu {
   from { opacity: 0; transform: translateY(-8px); }
   to { opacity: 1; transform: translateY(0); }
-}
-
-/* =========================================================
-   PÁGINA DO PRODUTO (LAYOUT & RESPONSIVIDADE)
-   ========================================================= */
-.product-details-wrap {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 36px;
-  align-items: start;
-}
-
-.product-gallery-card {
-  width: 100%;
-  background: var(--paper);
-  border-radius: var(--radius);
-  padding: 16px;
-  border: 1.5px solid rgba(227, 73, 136, 0.15);
-  box-shadow: var(--shadow-soft);
-  position: relative;
-  overflow: hidden;
-}
-
-.product-gallery-card img {
-  width: 100%;
-  height: auto;
-  aspect-ratio: 1 / 1;
-  border-radius: 14px;
-  object-fit: cover;
-  display: block;
-}
-
-/* Responsividade Mobile para a página de produto */
-@media (max-width: 768px) {
-  .product-details-wrap {
-    grid-template-columns: 1fr !important;
-    gap: 24px !important;
-  }
-  
-  .product-gallery-card {
-    max-width: 420px;
-    margin: 0 auto;
-  }
 }

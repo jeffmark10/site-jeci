@@ -379,8 +379,8 @@
   /* 1. CALÇADOS */
   async function loadProducts() {
     if (db) {
-      const { data } = await db.from("produtos").select("*").order("created_at", { ascending: false });
-      if (data) products = data;
+      const { data, error } = await db.from("produtos").select("*").order("created_at", { ascending: false });
+      if (!error && data) products = data;
     } else {
       products = JSON.parse(localStorage.getItem("jeci_produtos") || "[]");
     }
@@ -482,10 +482,15 @@
   };
 
   window.toggleStatus = async function(idx) {
-    products[idx].ativo = !products[idx].ativo;
+    const novoStatus = !products[idx].ativo;
     if (db) {
-      await db.from("produtos").update({ ativo: products[idx].ativo }).eq("id", products[idx].id);
+      const { error } = await db.from("produtos").update({ ativo: novoStatus }).eq("id", products[idx].id);
+      if (error) {
+        JeciUI.toast("Não foi possível atualizar o status: " + error.message, { type: "error" });
+        return;
+      }
     }
+    products[idx].ativo = novoStatus;
     localStorage.setItem("jeci_produtos", JSON.stringify(products));
     renderProductsTable();
   };
@@ -495,7 +500,11 @@
     if (!confirmed) return;
     
     if (db) {
-      await db.from("produtos").delete().eq("id", id);
+      const { error } = await db.from("produtos").delete().eq("id", id);
+      if (error) {
+        JeciUI.toast("Não foi possível excluir da nuvem: " + error.message, { type: "error" });
+        return;
+      }
     }
     products.splice(idx, 1);
     localStorage.setItem("jeci_produtos", JSON.stringify(products));
@@ -510,7 +519,6 @@
     const sizes = Array.from(document.querySelectorAll(".size-chip.selected")).map(c => c.textContent.trim());
     
     const prodData = {
-      id: existingId || String(Date.now()),
       codigo: document.getElementById("codigo").value.trim().toUpperCase(),
       categoria: document.getElementById("categoria").value,
       nome: document.getElementById("nome").value.trim(),
@@ -522,12 +530,25 @@
       ativo: document.getElementById("ativo").checked
     };
 
+    if (existingId) {
+      prodData.id = existingId;
+    }
+
     if (db) {
-      await db.from("produtos").upsert([prodData]);
+      const { data, error } = await db.from("produtos").upsert([prodData]).select();
+      if (error) {
+        JeciUI.toast("Não foi possível salvar na nuvem: " + error.message, { type: "error" });
+        return;
+      }
+      if (data && data[0]) {
+        prodData.id = data[0].id;
+      }
+    } else {
+      if (!existingId) prodData.id = String(Date.now());
     }
 
     if (existingId) {
-      const idx = products.findIndex(p => p.id === existingId);
+      const idx = products.findIndex(p => String(p.id) === String(existingId));
       if (idx !== -1) products[idx] = prodData;
     } else {
       products.unshift(prodData);
@@ -578,7 +599,11 @@
     if (!confirmed) return;
     
     if (db) {
-      await db.from("avaliacoes_produtos").delete().eq("id", reviewId);
+      const { error } = await db.from("avaliacoes_produtos").delete().eq("id", reviewId);
+      if (error) {
+        JeciUI.toast("Erro ao excluir: " + error.message, { type: "error" });
+        return;
+      }
     }
     loadProductReviews();
     JeciUI.toast("Avaliação removida.");
@@ -621,7 +646,11 @@
     if (!confirmed) return;
 
     if (db) {
-      await db.from("depoimentos_loja").delete().eq("id", reviewId);
+      const { error } = await db.from("depoimentos_loja").delete().eq("id", reviewId);
+      if (error) {
+        JeciUI.toast("Erro ao excluir: " + error.message, { type: "error" });
+        return;
+      }
     }
     loadStoreReviews();
     JeciUI.toast("Depoimento excluído.");
