@@ -1,17 +1,15 @@
 /* =========================================================
    JECI STORE — design tokens
-   Paleta baseada na identidade real da marca: gradiente rosa,
-   navy escuro nos textos, monograma cursivo "Js" + borboleta.
    ========================================================= */
 :root {
-  --pink-light:  #FBDCEA;  /* rosa claro, fundo de cards/ícones */
-  --pink-mid:    #F2A9C7;  /* rosa médio, do gradiente/avatar */
-  --pink-deep:   #E24E8A;  /* rosa vivo, acentos e preços */
-  --ink:         #2E3142;  /* navy escuro, títulos */
-  --body-gray:   #5B5F72;  /* cinza-azulado, parágrafos */
-  --paper:       #FFFFFF;
-  --cream:       #FFF7FA;  /* branco levemente rosado, seções alternadas */
-  --whatsapp:    #25D366;
+  --pink-light:   #FBDCEA;
+  --pink-mid:     #F2A9C7;
+  --pink-deep:    #E24E8A;
+  --ink:          #2E3142;
+  --body-gray:    #5B5F72;
+  --paper:        #FFFFFF;
+  --cream:        #FFF7FA;
+  --whatsapp:     #25D366;
   --whatsapp-dark: #128C4A;
 
   --font-display: "Poppins", system-ui, sans-serif;
@@ -288,7 +286,6 @@ h1, h2, h3, h4 {
   .hero-butterfly { animation: none; }
 }
 
-/* Signature element: etiqueta suspensa (swing tag) */
 .swing-tag {
   position: relative;
   background: var(--paper);
@@ -418,7 +415,7 @@ h1, h2, h3, h4 {
 }
 
 /* =========================================================
-   PRODUTOS
+   PRODUTOS & IMAGENS DINÂMICAS
    ========================================================= */
 .product-grid {
   display: grid;
@@ -435,11 +432,24 @@ h1, h2, h3, h4 {
   display: flex;
   flex-direction: column;
 }
-.product-art {
+.product-art-wrapper {
   background: var(--cream);
   border-radius: 14px;
-  padding: 18px 14px 10px;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-bottom: 14px;
+}
+.product-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+.product-card:hover .product-img {
+  transform: scale(1.05);
 }
 .product-tag {
   position: absolute;
@@ -447,8 +457,21 @@ h1, h2, h3, h4 {
   right: 14px;
   padding: 6px 12px;
   transform: rotate(-3deg);
+  z-index: 2;
 }
 .product-tag .tag-price { font-size: 0.92rem; }
+.product-code-badge {
+  display: inline-block;
+  align-self: flex-start;
+  background: var(--pink-light);
+  color: var(--pink-deep);
+  font-weight: 700;
+  font-size: 0.72rem;
+  padding: 3px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
 .product-card h3 {
   font-size: 1.04rem;
   margin-bottom: 6px;
@@ -609,6 +632,16 @@ h1, h2, h3, h4 {
   font-weight: 700;
   color: var(--pink-mid) !important;
 }
+.admin-discreet-link {
+  opacity: 0.35;
+  font-size: 0.76rem !important;
+  margin-top: 10px;
+  transition: opacity 0.2s ease;
+}
+.admin-discreet-link:hover {
+  opacity: 0.9;
+  color: var(--pink-mid) !important;
+}
 
 .footer-bottom {
   border-top: 1px solid rgba(255,255,255,0.12);
@@ -655,14 +688,11 @@ h1, h2, h3, h4 {
 }
 
 /* =========================================================
-   SCROLL REVEAL
+   SCROLL REVEAL & RESPONSIVE
    ========================================================= */
 .reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.6s ease, transform 0.6s ease; }
 .reveal.in-view { opacity: 1; transform: translateY(0); }
 
-/* =========================================================
-   RESPONSIVE
-   ========================================================= */
 @media (max-width: 980px) {
   .hero-inner { grid-template-columns: 1fr; text-align: left; padding-top: 44px; }
   .hero-art { order: -1; max-width: 340px; margin: 0 auto 12px; min-height: 280px; }

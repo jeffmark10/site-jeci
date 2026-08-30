@@ -1,0 +1,50 @@
+[
+  {
+    "id": "1",
+    "codigo": "SAN-001",
+    "nome": "Sandália Trança Boho",
+    "categoria": "Sandálias",
+    "preco": 89.90,
+    "descricao": "Tiras trançadas à mão e solado leve, perfeita para looks do dia a dia.",
+    "imagem": "https://images.unsplash.com/photo-1562273138-f46be4ebdf33?w=500&auto=format&fit=crop&q=60",
+    "tamanhos": ["35", "36", "37", "38"],
+    "destaque": true,
+    "ativo": true
+  },
+  {
+    "id": "2",
+    "codigo": "SAN-002",
+    "nome": "Sandália Rasteira Cristal",
+    "categoria": "Sandálias",
+    "preco": 79.90,
+    "descricao": "Detalhes brilhantes e tiras finas para elevar qualquer produção.",
+    "imagem": "https://images.unsplash.com/photo-1603808033192-082d6919d3e1?w=500&auto=format&fit=crop&q=60",
+    "tamanhos": ["36", "37", "38", "39"],
+    "destaque": true,
+    "ativo": true
+  },
+  {
+    "id": "3",
+    "codigo": "CAM-001",
+    "nome": "Camiseta Estampada Borboleta",
+    "categoria": "Camisetas",
+    "preco": 69.90,
+    "descricao": "Estampa exclusiva Jeci Store em algodão macio, caimento solto e confortável.",
+    "imagem": "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500&auto=format&fit=crop&q=60",
+    "tamanhos": ["P", "M", "G"],
+    "destaque": true,
+    "ativo": true
+  },
+  {
+    "id": "4",
+    "codigo": "CAM-002",
+    "nome": "Camiseta Básica Premium",
+    "categoria": "Camisetas",
+    "preco": 59.90,
+    "descricao": "Tecido 100% algodão com toque macio, essencial para o guarda-roupa.",
+    "imagem": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=500&auto=format&fit=crop&q=60",
+    "tamanhos": ["P", "M", "G", "GG"],
+    "destaque": true,
+    "ativo": true
+  }
+]

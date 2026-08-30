@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel Administrativo | Jeci Store</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  body { background: var(--cream); padding: 30px 0; }
+  .admin-wrap { max-width: 960px; margin: 0 auto; padding: 0 20px; }
+  .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+  .admin-card { background: var(--paper); border-radius: 16px; padding: 24px; box-shadow: var(--shadow-tag); margin-bottom: 24px; border: 1px solid rgba(226,78,138,0.12); }
+  .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group.full { grid-column: span 2; }
+  label { font-weight: 700; font-size: 0.85rem; color: var(--ink); }
+  input, select, textarea { font-family: inherit; font-size: 0.95rem; padding: 10px 14px; border: 1.5px solid rgba(46,49,66,0.15); border-radius: 8px; outline: none; }
+  input:focus, select:focus, textarea:focus { border-color: var(--pink-deep); }
+  .checkbox-group { display: flex; gap: 20px; align-items: center; margin-top: 10px; }
+  .checkbox-label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+  .table-responsive { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; text-align: left; margin-top: 14px; }
+  th, td { padding: 12px; border-bottom: 1px solid rgba(46,49,66,0.08); font-size: 0.9rem; vertical-align: middle; }
+  th { background: var(--pink-light); color: var(--pink-deep); font-family: var(--font-display); }
+  .actions-cell { display: flex; gap: 8px; }
+  .btn-danger { background: #dc3545; color: white; padding: 6px 12px; font-size: 0.8rem; border-radius: 6px; }
+  .btn-edit { background: var(--pink-deep); color: white; padding: 6px 12px; font-size: 0.8rem; border-radius: 6px; }
+  .preview-thumb { width: 50px; height: 50px; object-fit: cover; border-radius: 6px; background: var(--cream); }
+  .admin-bar-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+
+<div class="admin-wrap">
+  <div class="admin-header">
+    <div>
+      <h1>Painel de Produtos</h1>
+      <p>Gerencie o catálogo da Jeci Store</p>
+    </div>
+    <div class="admin-bar-actions">
+      <a href="index.html" class="btn btn-outline btn-sm">← Ir para a Loja</a>
+      <button id="btnExport" class="btn btn-whatsapp btn-sm">📥 Baixar produtos.json</button>
+      <input type="file" id="importInput" accept=".json" style="display:none">
+      <button id="btnImport" class="btn btn-ghost btn-sm">📤 Carregar JSON</button>
+    </div>
+  </div>
+
+  <div class="admin-card">
+    <h2 id="formTitle">Novo Produto</h2>
+    <form id="productForm">
+      <input type="hidden" id="prodId">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="codigo">Código SKU *</label>
+          <input type="text" id="codigo" placeholder="ex: SAN-001 ou CAM-001" required>
+        </div>
+        <div class="form-group">
+          <label for="categoria">Categoria *</label>
+          <select id="categoria" required>
+            <option value="Sandálias">Sandálias</option>
+            <option value="Camisetas">Camisetas</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="nome">Nome do Produto *</label>
+          <input type="text" id="nome" placeholder="ex: Sandália Trança Boho" required>
+        </div>
+        <div class="form-group">
+          <label for="preco">Preço (R$) *</label>
+          <input type="number" id="preco" step="0.01" placeholder="89.90" required>
+        </div>
+        <div class="form-group full">
+          <label for="descricao">Descrição Curta</label>
+          <textarea id="descricao" rows="2" placeholder="Detalhes de conforto, solado, tecido..."></textarea>
+        </div>
+        <div class="form-group full">
+          <label for="tamanhos">Tamanhos Disponíveis (separados por vírgula)</label>
+          <input type="text" id="tamanhos" placeholder="ex: 35, 36, 37, 38 ou P, M, G">
+        </div>
+        <div class="form-group full">
+          <label for="imgFile">Foto do Produto (Upload do Celular ou Computador)</label>
+          <input type="file" id="imgFile" accept="image/*">
+          <input type="text" id="imgUrl" placeholder="Ou cole o link direto da imagem" style="margin-top: 6px;">
+        </div>
+        <div class="form-group full checkbox-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="destaque" checked> Exibir nos Destaques da Home
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="ativo" checked> Produto Ativo (Disponível)
+          </label>
+        </div>
+      </div>
+      <div style="margin-top: 20px; display: flex; gap: 10px;">
+        <button type="submit" class="btn btn-whatsapp" id="btnSave">Salvar Produto</button>
+        <button type="button" class="btn btn-outline" id="btnCancel" style="display:none;">Cancelar Edição</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="admin-card">
+    <h2>Produtos Cadastrados</h2>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Foto</th>
+            <th>Código</th>
+            <th>Nome</th>
+            <th>Preço</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  let products = [];
+  let base64Image = "";
+
+  const form = document.getElementById("productForm");
+  const tableBody = document.getElementById("tableBody");
+  const fileInput = document.getElementById("imgFile");
+  const btnExport = document.getElementById("btnExport");
+  const btnImport = document.getElementById("btnImport");
+  const importInput = document.getElementById("importInput");
+  const btnCancel = document.getElementById("btnCancel");
+
+  async function init() {
+    const cached = localStorage.getItem("jeci_produtos");
+    if (cached) {
+      products = JSON.parse(cached);
+    } else {
+      try {
+        const res = await fetch("produtos.json");
+        products = await res.json();
+        saveToStorage();
+      } catch (e) {
+        products = [];
+      }
+    }
+    renderTable();
+  }
+
+  function saveToStorage() {
+    localStorage.setItem("jeci_produtos", JSON.stringify(products));
+    renderTable();
+  }
+
+  fileInput.addEventListener("change", function() {
+    const file = this.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        base64Image = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  function renderTable() {
+    tableBody.innerHTML = "";
+    products.forEach((prod, index) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td><img src="${prod.imagem}" class="preview-thumb" alt="${prod.nome}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 50 50%22><rect fill=%22%23eee%22 width=%2250%22 height=%2250%22/></svg>'"></td>
+        <td><strong>${prod.codigo}</strong></td>
+        <td>${prod.nome}</td>
+        <td>R$ ${Number(prod.preco).toFixed(2)}</td>
+        <td>${prod.ativo ? '✅ Ativo' : '❌ Pausado'}</td>
+        <td class="actions-cell">
+          <button class="btn-edit" onclick="window.editProduct(${index})">Editar</button>
+          <button class="btn-danger" onclick="window.deleteProduct(${index})">Excluir</button>
+        </td>
+      `;
+      tableBody.appendChild(tr);
+    });
+  }
+
+  window.editProduct = function(index) {
+    const p = products[index];
+    document.getElementById("prodId").value = index;
+    document.getElementById("codigo").value = p.codigo;
+    document.getElementById("categoria").value = p.categoria;
+    document.getElementById("nome").value = p.nome;
+    document.getElementById("preco").value = p.preco;
+    document.getElementById("descricao").value = p.descricao || "";
+    document.getElementById("tamanhos").value = (p.tamanhos || []).join(", ");
+    document.getElementById("imgUrl").value = p.imagem.startsWith("data:") ? "" : p.imagem;
+    document.getElementById("destaque").checked = p.destaque;
+    document.getElementById("ativo").checked = p.ativo;
+    base64Image = p.imagem.startsWith("data:") ? p.imagem : "";
+
+    document.getElementById("formTitle").textContent = "Editar Produto: " + p.codigo;
+    btnCancel.style.display = "inline-flex";
+  };
+
+  window.deleteProduct = function(index) {
+    if (confirm(`Tem certeza que deseja excluir o produto ${products[index].codigo}?`)) {
+      products.splice(index, 1);
+      saveToStorage();
+    }
+  };
+
+  btnCancel.addEventListener("click", resetForm);
+
+  function resetForm() {
+    form.reset();
+    document.getElementById("prodId").value = "";
+    document.getElementById("formTitle").textContent = "Novo Produto";
+    btnCancel.style.display = "none";
+    base64Image = "";
+  }
+
+  form.addEventListener("submit", function(e) {
+    e.preventDefault();
+    const editIdx = document.getElementById("prodId").value;
+    const finalImg = base64Image || document.getElementById("imgUrl").value || "https://images.unsplash.com/photo-1562273138-f46be4ebdf33?w=500";
+    
+    const sizes = document.getElementById("tamanhos").value
+      .split(",")
+      .map(s => s.trim())
+      .filter(s => s.length > 0);
+
+    const productData = {
+      id: editIdx !== "" ? products[editIdx].id : String(Date.now()),
+      codigo: document.getElementById("codigo").value.trim().toUpperCase(),
+      categoria: document.getElementById("categoria").value,
+      nome: document.getElementById("nome").value.trim(),
+      preco: parseFloat(document.getElementById("preco").value),
+      descricao: document.getElementById("descricao").value.trim(),
+      imagem: finalImg,
+      tamanhos: sizes,
+      destaque: document.getElementById("destaque").checked,
+      ativo: document.getElementById("ativo").checked
+    };
+
+    if (editIdx !== "") {
+      products[editIdx] = productData;
+    } else {
+      products.push(productData);
+    }
+
+    saveToStorage();
+    resetForm();
+    alert("Produto salvo com sucesso!");
+  });
+
+  btnExport.addEventListener("click", function() {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(products, null, 2));
+    const dlAnchor = document.createElement("a");
+    dlAnchor.setAttribute("href", dataStr);
+    dlAnchor.setAttribute("download", "produtos.json");
+    dlAnchor.click();
+  });
+
+  btnImport.addEventListener("click", () => importInput.click());
+  importInput.addEventListener("change", function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      try {
+        products = JSON.parse(ev.target.result);
+        saveToStorage();
+        alert("Catálogo importado com sucesso!");
+      } catch (err) {
+        alert("Arquivo JSON inválido.");
+      }
+    };
+    reader.readAsText(file);
+  });
+
+  init();
+})();
+</script>
+</body>
+</html>
