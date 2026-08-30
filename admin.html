@@ -12,258 +12,174 @@
   body { background: var(--cream); padding: 30px 0; min-height: 100vh; }
   .admin-wrap { max-width: 960px; margin: 0 auto; padding: 0 20px; }
   
-  /* Modal de Autenticação */
   .auth-overlay {
-    position: fixed;
-    inset: 0;
-    background: var(--cream);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    padding: 20px;
+    position: fixed; inset: 0; background: var(--cream);
+    display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
   }
   .auth-card {
-    background: var(--paper);
-    border-radius: 20px;
-    padding: 36px 28px;
-    max-width: 400px;
-    width: 100%;
-    box-shadow: var(--shadow-soft);
-    border: 1px solid rgba(226,78,138,0.18);
-    text-align: center;
+    background: var(--paper); border-radius: 20px; padding: 36px 28px;
+    max-width: 400px; width: 100%; box-shadow: var(--shadow-soft);
+    border: 1px solid rgba(226,78,138,0.18); text-align: center;
   }
-  .auth-card h2 { margin-bottom: 6px; }
-  .auth-card p { font-size: 0.9rem; margin-bottom: 20px; }
-  .auth-input-group { margin-bottom: 16px; text-align: left; }
   .auth-error { color: #dc3545; font-size: 0.85rem; font-weight: 700; margin-top: 10px; display: none; }
 
-  /* Estrutura do Painel */
   .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
   .admin-card { background: var(--paper); border-radius: 16px; padding: 24px; box-shadow: var(--shadow-tag); margin-bottom: 24px; border: 1px solid rgba(226,78,138,0.12); }
   .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
   .form-group { display: flex; flex-direction: column; gap: 6px; }
   .form-group.full { grid-column: span 2; }
   label { font-weight: 700; font-size: 0.85rem; color: var(--ink); }
-  input, select, textarea { font-family: inherit; font-size: 0.95rem; padding: 10px 14px; border: 1.5px solid rgba(46,49,66,0.15); border-radius: 8px; outline: none; transition: border-color 0.2s; }
-  input:focus, select:focus, textarea:focus { border-color: var(--pink-deep); }
+  input, select, textarea { font-family: inherit; font-size: 0.95rem; padding: 10px 14px; border: 1.5px solid rgba(46,49,66,0.15); border-radius: 8px; outline: none; }
   
-  /* Seletor Visual de Tamanhos (Chips) */
   .size-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
   .size-chip {
-    padding: 6px 14px;
-    border-radius: 20px;
-    border: 1.5px solid rgba(46,49,66,0.2);
-    font-size: 0.85rem;
-    font-weight: 700;
-    cursor: pointer;
-    user-select: none;
-    transition: all 0.15s ease;
+    padding: 6px 14px; border-radius: 20px; border: 1.5px solid rgba(46,49,66,0.2);
+    font-size: 0.85rem; font-weight: 700; cursor: pointer; user-select: none;
   }
-  .size-chip.selected {
-    background: var(--pink-deep);
-    border-color: var(--pink-deep);
-    color: #fff;
-  }
+  .size-chip.selected { background: var(--pink-deep); border-color: var(--pink-deep); color: #fff; }
 
-  /* Upload com ImgBB e Status */
   .image-upload-box {
-    display: flex;
-    gap: 16px;
-    align-items: center;
-    border: 1.5px dashed rgba(226,78,138,0.4);
-    padding: 14px;
-    border-radius: 10px;
-    background: var(--cream);
+    display: flex; gap: 16px; align-items: center; border: 1.5px dashed rgba(226,78,138,0.4);
+    padding: 14px; border-radius: 10px; background: var(--cream);
   }
   .image-preview-slot {
-    width: 80px;
-    height: 80px;
-    border-radius: 8px;
-    background: #fff;
-    border: 1px solid rgba(46,49,66,0.1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    flex-shrink: 0;
+    width: 80px; height: 80px; border-radius: 8px; background: #fff;
+    border: 1px solid rgba(46,49,66,0.1); display: flex; align-items: center; justify-content: center; overflow: hidden;
   }
   .image-preview-slot img { width: 100%; height: 100%; object-fit: cover; }
   .image-inputs { display: flex; flex-direction: column; gap: 8px; flex-grow: 1; }
-  .upload-status { font-size: 0.82rem; font-weight: 700; color: var(--pink-deep); display: none; }
 
-  /* Barra de Pesquisa e Filtros */
-  .table-controls { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
-  .table-controls input, .table-controls select { padding: 8px 12px; font-size: 0.88rem; }
   .table-responsive { overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; text-align: left; }
+  table { width: 100%; border-collapse: collapse; text-align: left; margin-top: 14px; }
   th, td { padding: 12px; border-bottom: 1px solid rgba(46,49,66,0.08); font-size: 0.9rem; vertical-align: middle; }
-  th { background: var(--pink-light); color: var(--pink-deep); font-family: var(--font-display); }
+  th { background: var(--pink-light); color: var(--pink-deep); }
   
-  /* Status Toggle */
   .status-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 5px 10px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 700;
-    cursor: pointer;
-    border: none;
-    transition: transform 0.15s ease, opacity 0.15s ease;
+    padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; cursor: pointer; border: none;
   }
-  .status-btn:hover { transform: scale(1.05); }
   .status-btn.active { background: #d4edda; color: #155724; }
   .status-btn.inactive { background: #f8d7da; color: #721c24; }
-  
-  tr.row-inactive td:not(:last-child) { opacity: 0.55; }
-
-  .actions-cell { display: flex; gap: 8px; }
-  .btn-danger { background: #dc3545; color: white; padding: 6px 12px; font-size: 0.8rem; border-radius: 6px; }
-  .btn-edit { background: var(--pink-deep); color: white; padding: 6px 12px; font-size: 0.8rem; border-radius: 6px; }
-  .preview-thumb { width: 46px; height: 46px; object-fit: cover; border-radius: 6px; background: var(--cream); }
-  .admin-bar-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-  .btn-logout { background: transparent; color: var(--body-gray); border: 1.5px solid rgba(46,49,66,0.2); }
-  .btn-logout:hover { background: rgba(46,49,66,0.08); color: var(--ink); }
+  .preview-thumb { width: 46px; height: 46px; object-fit: cover; border-radius: 6px; }
 </style>
 </head>
 <body>
 
-<!-- MODAL DE LOGIN -->
 <div class="auth-overlay" id="authOverlay">
   <div class="auth-card">
     <span class="brand-script" style="font-size: 2.5rem; color: var(--pink-deep); display: block; margin-bottom: 8px;">Js</span>
-    <h2>Área Restrita</h2>
-    <p>Digite a senha administrativa para acessar o catálogo.</p>
+    <h2>Painel da Loja</h2>
+    <p>Digite a senha administrativa:</p>
     <form id="authForm">
-      <div class="auth-input-group">
-        <label for="adminPass">Senha de Acesso</label>
-        <input type="password" id="adminPass" placeholder="••••••••" required style="width: 100%; margin-top: 4px;">
-      </div>
-      <button type="submit" class="btn btn-whatsapp btn-block">Entrar no Painel</button>
-      <p class="auth-error" id="authError">Senha incorreta. Tente novamente.</p>
-      <div style="margin-top: 14px;">
-        <a href="index.html" style="font-size: 0.85rem; color: var(--body-gray);">← Voltar para a loja</a>
-      </div>
+      <input type="password" id="adminPass" placeholder="••••••••" required style="width: 100%; margin-bottom: 14px; padding: 10px;">
+      <button type="submit" class="btn btn-whatsapp btn-block">Entrar</button>
+      <p class="auth-error" id="authError">Senha incorreta.</p>
     </form>
   </div>
 </div>
 
-<!-- CONTEÚDO PRINCIPAL -->
 <div class="admin-wrap" id="adminContent" style="display: none;">
   <div class="admin-header">
     <div>
-      <h1>Painel de Produtos</h1>
-      <p>Gerencie o catálogo da Jeci Store</p>
+      <h1>Gerenciador de Calçados</h1>
+      <p>Catálogo & Avaliações da Jeci Store</p>
     </div>
-    <div class="admin-bar-actions">
+    <div style="display:flex; gap:10px;">
       <a href="index.html" class="btn btn-outline btn-sm">← Loja</a>
       <button id="btnExport" class="btn btn-whatsapp btn-sm">📥 Baixar produtos.json</button>
-      <input type="file" id="importInput" accept=".json" style="display:none">
-      <button id="btnImport" class="btn btn-ghost btn-sm">📤 Carregar JSON</button>
-      <button id="btnLogout" class="btn btn-logout btn-sm">Sair 🚪</button>
+      <button id="btnLogout" class="btn btn-ghost btn-sm">Sair 🚪</button>
     </div>
   </div>
 
   <div class="admin-card">
-    <h2 id="formTitle">Adicionar Novo Produto</h2>
+    <h2 id="formTitle">Novo Calçado</h2>
     <form id="productForm">
       <input type="hidden" id="prodId">
       
       <div class="form-grid">
         <div class="form-group">
-          <label for="categoria">Categoria *</label>
+          <label for="categoria">Categoria de Calçado *</label>
           <select id="categoria" required>
             <option value="Sandálias">Sandálias</option>
-            <option value="Camisetas">Camisetas</option>
+            <option value="Rasteiras">Rasteiras</option>
+            <option value="Papetes">Papetes</option>
+            <option value="Saltos">Saltos & Blocos</option>
+            <option value="Sapatilhas">Sapatilhas</option>
           </select>
         </div>
 
         <div class="form-group">
-          <label for="codigo">Código SKU * <small style="color:var(--pink-deep); font-weight: normal;">(automático ou personalizado)</small></label>
-          <input type="text" id="codigo" placeholder="ex: SAN-001" required>
+          <label for="codigo">Código SKU *</label>
+          <input type="text" id="codigo" placeholder="ex: SAN-001, RAS-001..." required>
         </div>
 
         <div class="form-group">
-          <label for="nome">Nome do Produto *</label>
+          <label for="nome">Nome do Modelo *</label>
           <input type="text" id="nome" placeholder="ex: Sandália Rasteira Cristal" required>
         </div>
 
         <div class="form-group">
-          <label for="preco">Preço de Venda (R$) *</label>
+          <label for="preco">Preço (R$) *</label>
           <input type="number" id="preco" step="0.01" placeholder="89.90" required>
         </div>
 
         <div class="form-group full">
-          <label>Tamanhos Disponíveis</label>
-          <div class="size-chips" id="sizeChipsContainer"></div>
-          <input type="text" id="tamanhosExtra" placeholder="Ou digite outros tamanhos separados por vírgula (ex: 33, 41, Especial)" style="margin-top: 8px;">
+          <label>Numerações Disponíveis</label>
+          <div class="size-chips" id="sizeChipsContainer">
+            <span class="size-chip selected">34</span>
+            <span class="size-chip selected">35</span>
+            <span class="size-chip selected">36</span>
+            <span class="size-chip selected">37</span>
+            <span class="size-chip selected">38</span>
+            <span class="size-chip selected">39</span>
+            <span class="size-chip">40</span>
+          </div>
         </div>
 
         <div class="form-group full">
-          <label>Foto do Produto (Upload Automático)</label>
+          <label>Foto do Calçado</label>
           <div class="image-upload-box">
-            <div class="image-preview-slot" id="previewContainer">
-              <span style="font-size:0.75rem; color:var(--body-gray); text-align:center;">Sem Foto</span>
-            </div>
+            <div class="image-preview-slot" id="previewContainer">Sem Foto</div>
             <div class="image-inputs">
               <input type="file" id="imgFile" accept="image/*">
-              <span class="upload-status" id="uploadStatus">⏳ Enviando foto para nuvem...</span>
               <input type="text" id="imgUrl" placeholder="Ou cole a URL direta da imagem">
             </div>
           </div>
         </div>
 
         <div class="form-group full">
-          <label for="descricao">Descrição Curta</label>
-          <textarea id="descricao" rows="2" placeholder="Detalhes de conforto, acabamento, palmilha, material..."></textarea>
+          <label for="descricao">Descrição (Palmilha, solado, fivela...)</label>
+          <textarea id="descricao" rows="2" placeholder="Detalhes de conforto, solado antiderrapante..."></textarea>
         </div>
 
         <div class="form-group full" style="display:flex; gap:24px;">
           <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-            <input type="checkbox" id="destaque" checked> Exibir nos Destaques da Home
+            <input type="checkbox" id="destaque" checked> Exibir nos Destaques
           </label>
           <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-            <input type="checkbox" id="ativo" checked> Produto Ativo (Disponível para venda)
+            <input type="checkbox" id="ativo" checked> Calçado Disponível
           </label>
         </div>
       </div>
 
       <div style="margin-top: 20px; display: flex; gap: 10px;">
-        <button type="submit" class="btn btn-whatsapp" id="btnSave">Salvar Produto</button>
-        <button type="button" class="btn btn-outline" id="btnCancel" style="display:none;">Cancelar Edição</button>
+        <button type="submit" class="btn btn-whatsapp" id="btnSave">Salvar Calçado</button>
+        <button type="button" class="btn btn-outline" id="btnCancel" style="display:none;">Cancelar</button>
       </div>
     </form>
   </div>
 
   <div class="admin-card">
-    <h2>Produtos no Catálogo</h2>
-    
-    <div class="table-controls">
-      <input type="text" id="searchFilter" placeholder="🔍 Buscar por nome ou código..." style="flex-grow: 1;">
-      <select id="categoryFilter">
-        <option value="ALL">Todas as categorias</option>
-        <option value="Sandálias">Sandálias</option>
-        <option value="Camisetas">Camisetas</option>
-      </select>
-      <select id="statusFilter">
-        <option value="ALL">Todos os status</option>
-        <option value="active">Somente Ativos</option>
-        <option value="inactive">Somente Desativados</option>
-      </select>
-    </div>
-
+    <h2>Calçados Cadastrados</h2>
     <div class="table-responsive">
       <table>
         <thead>
           <tr>
             <th>Foto</th>
             <th>Código</th>
-            <th>Nome</th>
+            <th>Modelo</th>
             <th>Preço</th>
-            <th>Tamanhos</th>
-            <th>Status (Clique p/ mudar)</th>
+            <th>Nota</th>
+            <th>Status</th>
             <th>Ações</th>
           </tr>
         </thead>
@@ -276,68 +192,30 @@
 <script>
 (function() {
   const ADMIN_PASSWORD = "jeci2026";
-  
-  /* =====================================================
-     COLE SUA CHAVE DO IMGBB AQUI:
-     ===================================================== */
-  const IMGBB_API_KEY = "f230f2d81c42c92ba630ff6178c7bf55";
-
   let products = [];
-  let currentImageUrl = "";
+  let currentImageData = "";
 
-  const SIZES_CONFIG = {
-    "Sandálias": ["34", "35", "36", "37", "38", "39", "40"],
-    "Camisetas": ["PP", "P", "M", "G", "GG"]
-  };
-
-  const authOverlay = document.getElementById("authOverlay");
-  const adminContent = document.getElementById("adminContent");
-  const authForm = document.getElementById("authForm");
-  const authError = document.getElementById("authError");
-  const btnLogout = document.getElementById("btnLogout");
-
-  const form = document.getElementById("productForm");
-  const tableBody = document.getElementById("tableBody");
-  const fileInput = document.getElementById("imgFile");
-  const imgUrlInput = document.getElementById("imgUrl");
-  const uploadStatus = document.getElementById("uploadStatus");
-  const previewContainer = document.getElementById("previewContainer");
-  const categorySelect = document.getElementById("categoria");
-  const skuInput = document.getElementById("codigo");
-  const sizeChipsContainer = document.getElementById("sizeChipsContainer");
-  const searchFilter = document.getElementById("searchFilter");
-  const categoryFilter = document.getElementById("categoryFilter");
-  const statusFilter = document.getElementById("statusFilter");
-  const btnExport = document.getElementById("btnExport");
-  const btnImport = document.getElementById("btnImport");
-  const importInput = document.getElementById("importInput");
-  const btnCancel = document.getElementById("btnCancel");
-  const btnSave = document.getElementById("btnSave");
+  const SIZES = ["34", "35", "36", "37", "38", "39", "40"];
 
   function checkSession() {
     if (sessionStorage.getItem("jeci_auth") === "true") {
-      authOverlay.style.display = "none";
-      adminContent.style.display = "block";
+      document.getElementById("authOverlay").style.display = "none";
+      document.getElementById("adminContent").style.display = "block";
       initCatalog();
-    } else {
-      authOverlay.style.display = "flex";
-      adminContent.style.display = "none";
     }
   }
 
-  authForm.addEventListener("submit", function(e) {
+  document.getElementById("authForm").addEventListener("submit", function(e) {
     e.preventDefault();
     if (document.getElementById("adminPass").value.trim() === ADMIN_PASSWORD) {
       sessionStorage.setItem("jeci_auth", "true");
-      authError.style.display = "none";
       checkSession();
     } else {
-      authError.style.display = "block";
-      document.getElementById("adminPass").value = "";
+      document.getElementById("authError").style.display = "block";
     }
   });
 
-  btnLogout.addEventListener("click", function() {
+  document.getElementById("btnLogout").addEventListener("click", () => {
     sessionStorage.removeItem("jeci_auth");
     window.location.reload();
   });
@@ -347,264 +225,102 @@
     if (cached) {
       products = JSON.parse(cached);
     } else {
-      try {
-        const res = await fetch("produtos.json");
-        products = await res.json();
-        saveToStorage();
-      } catch (e) {
-        products = [];
-      }
+      const res = await fetch("produtos.json");
+      products = await res.json();
     }
-    renderSizeChips();
-    suggestSKU();
+    setupSizeChips();
     renderTable();
   }
 
-  function saveToStorage() {
-    localStorage.setItem("jeci_produtos", JSON.stringify(products));
-    renderTable();
-  }
-
-  window.toggleStatus = function(index) {
-    products[index].ativo = !products[index].ativo;
-    saveToStorage();
-  };
-
-  function suggestSKU() {
-    if (document.getElementById("prodId").value !== "") return;
-    const cat = categorySelect.value;
-    const prefix = cat === "Sandálias" ? "SAN" : "CAM";
-    const sameCat = products.filter(p => p.codigo && p.codigo.startsWith(prefix));
-    const nextNum = String(sameCat.length + 1).padStart(3, "0");
-    skuInput.value = `${prefix}-${nextNum}`;
-  }
-
-  categorySelect.addEventListener("change", () => {
-    renderSizeChips();
-    suggestSKU();
-  });
-
-  function renderSizeChips(selected = []) {
-    sizeChipsContainer.innerHTML = "";
-    const list = SIZES_CONFIG[categorySelect.value] || [];
-    list.forEach(size => {
-      const chip = document.createElement("span");
-      chip.className = "size-chip" + (selected.includes(size) ? " selected" : "");
-      chip.textContent = size;
-      chip.addEventListener("click", () => chip.classList.toggle("selected"));
-      sizeChipsContainer.appendChild(chip);
+  function setupSizeChips() {
+    document.querySelectorAll(".size-chip").forEach(c => {
+      c.addEventListener("click", () => c.classList.toggle("selected"));
     });
   }
 
-  /* =====================================================
-     UPLOAD AUTOMÁTICO PARA IMGBB
-     ===================================================== */
-  fileInput.addEventListener("change", async function() {
+  document.getElementById("imgFile").addEventListener("change", function() {
     const file = this.files[0];
     if (!file) return;
-
-    if (!IMGBB_API_KEY || IMGBB_API_KEY === "SUA_CHAVE_API_AQUI") {
-      alert("Por favor, configure sua chave da API do ImgBB no script do admin.html");
-      return;
-    }
-
-    uploadStatus.style.display = "block";
-    uploadStatus.textContent = "⏳ Enviando foto para nuvem...";
-    btnSave.disabled = true;
-
-    try {
-      const formData = new FormData();
-      formData.append("image", file);
-
-      const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
-        method: "POST",
-        body: formData
-      });
-
-      const data = await res.json();
-
-      if (data && data.success) {
-        currentImageUrl = data.data.url;
-        imgUrlInput.value = currentImageUrl;
-        updatePreview(currentImageUrl);
-        uploadStatus.textContent = "✅ Imagem enviada com sucesso!";
-      } else {
-        throw new Error(data.error ? data.error.message : "Erro no envio");
-      }
-    } catch (err) {
-      alert("Erro ao fazer upload da imagem: " + err.message);
-      uploadStatus.textContent = "❌ Falha no envio.";
-    } finally {
-      btnSave.disabled = false;
-    }
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      currentImageData = e.target.result;
+      document.getElementById("previewContainer").innerHTML = `<img src="${currentImageData}">`;
+    };
+    reader.readAsDataURL(file);
   });
-
-  imgUrlInput.addEventListener("input", function() {
-    if (this.value.trim()) {
-      currentImageUrl = this.value.trim();
-      updatePreview(currentImageUrl);
-    }
-  });
-
-  function updatePreview(src) {
-    if (src) {
-      previewContainer.innerHTML = `<img src="${src}" alt="Preview" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 50 50%22><rect fill=%22%23eee%22 width=%2250%22 height=%2250%22/></svg>'">`;
-    } else {
-      previewContainer.innerHTML = `<span style="font-size:0.75rem; color:var(--body-gray); text-align:center;">Sem Foto</span>`;
-    }
-  }
-
-  searchFilter.addEventListener("input", renderTable);
-  categoryFilter.addEventListener("change", renderTable);
-  statusFilter.addEventListener("change", renderTable);
 
   function renderTable() {
-    tableBody.innerHTML = "";
-    const term = searchFilter.value.toLowerCase();
-    const catFilt = categoryFilter.value;
-    const statFilt = statusFilter.value;
-
-    const filtered = products.filter(p => {
-      const matchSearch = p.nome.toLowerCase().includes(term) || (p.codigo && p.codigo.toLowerCase().includes(term));
-      const matchCat = catFilt === "ALL" || p.categoria === catFilt;
-      const matchStat = statFilt === "ALL" || (statFilt === "active" ? p.ativo : !p.ativo);
-      return matchSearch && matchCat && matchStat;
-    });
-
-    filtered.forEach((prod) => {
-      const realIndex = products.findIndex(item => item.id === prod.id);
+    const tbody = document.getElementById("tableBody");
+    tbody.innerHTML = "";
+    products.forEach((p, idx) => {
       const tr = document.createElement("tr");
-      if (!prod.ativo) tr.className = "row-inactive";
-
-      const statusBadge = prod.ativo 
-        ? `<button class="status-btn active" onclick="window.toggleStatus(${realIndex})" title="Clique para desativar">✅ Ativo</button>`
-        : `<button class="status-btn inactive" onclick="window.toggleStatus(${realIndex})" title="Clique para ativar">⏸️ Desativado</button>`;
-
       tr.innerHTML = `
-        <td><img src="${prod.imagem}" class="preview-thumb" alt="${prod.nome}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 50 50%22><rect fill=%22%23eee%22 width=%2250%22 height=%2250%22/></svg>'"></td>
-        <td><strong>${prod.codigo}</strong></td>
-        <td>${prod.nome}</td>
-        <td>R$ ${Number(prod.preco).toFixed(2)}</td>
-        <td><small>${(prod.tamanhos || []).join(", ") || "—"}</small></td>
-        <td>${statusBadge}</td>
-        <td class="actions-cell">
-          <button class="btn-edit" onclick="window.editProduct(${realIndex})">Editar</button>
-          <button class="btn-danger" onclick="window.deleteProduct(${realIndex})">Excluir</button>
+        <td><img src="${p.imagem}" class="preview-thumb"></td>
+        <td><strong>${p.codigo}</strong></td>
+        <td>${p.nome}</td>
+        <td>R$ ${Number(p.preco).toFixed(2)}</td>
+        <td>★ ${p.avaliacao || 5.0} (${p.totalAvaliacoes || 1})</td>
+        <td>
+          <button class="status-btn ${p.ativo ? 'active' : 'inactive'}" onclick="window.toggleStatus(${idx})">
+            ${p.ativo ? '✅ Ativo' : '⏸️ Pausado'}
+          </button>
+        </td>
+        <td>
+          <button class="btn btn-outline btn-sm" onclick="window.deleteProduct(${idx})">Excluir</button>
         </td>
       `;
-      tableBody.appendChild(tr);
+      tbody.appendChild(tr);
     });
   }
 
-  window.editProduct = function(index) {
-    const p = products[index];
-    document.getElementById("prodId").value = index;
-    document.getElementById("codigo").value = p.codigo;
-    document.getElementById("categoria").value = p.categoria;
-    document.getElementById("nome").value = p.nome;
-    document.getElementById("preco").value = p.preco;
-    document.getElementById("descricao").value = p.descricao || "";
-    document.getElementById("destaque").checked = p.destaque;
-    document.getElementById("ativo").checked = p.ativo;
-
-    const knownSizes = SIZES_CONFIG[p.categoria] || [];
-    const chipsSelected = (p.tamanhos || []).filter(s => knownSizes.includes(s));
-    const extraSizes = (p.tamanhos || []).filter(s => !knownSizes.includes(s));
-
-    renderSizeChips(chipsSelected);
-    document.getElementById("tamanhosExtra").value = extraSizes.join(", ");
-
-    currentImageUrl = p.imagem || "";
-    updatePreview(currentImageUrl);
-    imgUrlInput.value = currentImageUrl;
-    uploadStatus.style.display = "none";
-
-    document.getElementById("formTitle").textContent = "Editar Produto: " + p.codigo;
-    btnCancel.style.display = "inline-flex";
-    window.scrollTo({ top: form.offsetTop - 40, behavior: "smooth" });
+  window.toggleStatus = function(idx) {
+    products[idx].ativo = !products[idx].ativo;
+    localStorage.setItem("jeci_produtos", JSON.stringify(products));
+    renderTable();
   };
 
-  window.deleteProduct = function(index) {
-    if (confirm(`Tem certeza que deseja excluir o produto ${products[index].codigo}?`)) {
-      products.splice(index, 1);
-      saveToStorage();
+  window.deleteProduct = function(idx) {
+    if (confirm("Excluir este calçado?")) {
+      products.splice(idx, 1);
+      localStorage.setItem("jeci_produtos", JSON.stringify(products));
+      renderTable();
     }
   };
 
-  btnCancel.addEventListener("click", resetForm);
-
-  function resetForm() {
-    form.reset();
-    document.getElementById("prodId").value = "";
-    document.getElementById("formTitle").textContent = "Adicionar Novo Produto";
-    btnCancel.style.display = "none";
-    uploadStatus.style.display = "none";
-    currentImageUrl = "";
-    updatePreview("");
-    renderSizeChips();
-    suggestSKU();
-  }
-
-  form.addEventListener("submit", function(e) {
+  document.getElementById("productForm").addEventListener("submit", function(e) {
     e.preventDefault();
-    const editIdx = document.getElementById("prodId").value;
+    const sizes = Array.from(document.querySelectorAll(".size-chip.selected")).map(c => c.textContent);
     
-    const selectedChips = Array.from(document.querySelectorAll(".size-chip.selected")).map(c => c.textContent);
-    const extraSizes = document.getElementById("tamanhosExtra").value
-      .split(",")
-      .map(s => s.trim())
-      .filter(s => s.length > 0);
-    const allSizes = [...selectedChips, ...extraSizes];
-
-    const finalImg = currentImageUrl || imgUrlInput.value.trim() || "https://images.unsplash.com/photo-1562273138-f46be4ebdf33?w=500";
-
-    const productData = {
-      id: editIdx !== "" ? products[editIdx].id : String(Date.now()),
+    const newProd = {
+      id: String(Date.now()),
       codigo: document.getElementById("codigo").value.trim().toUpperCase(),
       categoria: document.getElementById("categoria").value,
       nome: document.getElementById("nome").value.trim(),
       preco: parseFloat(document.getElementById("preco").value),
       descricao: document.getElementById("descricao").value.trim(),
-      imagem: finalImg,
-      tamanhos: allSizes,
+      imagem: currentImageData || document.getElementById("imgUrl").value.trim() || "https://images.unsplash.com/photo-1562273138-f46be4ebdf33?w=500",
+      tamanhos: sizes,
+      avaliacao: 5.0,
+      totalAvaliacoes: 1,
       destaque: document.getElementById("destaque").checked,
       ativo: document.getElementById("ativo").checked
     };
 
-    if (editIdx !== "") {
-      products[editIdx] = productData;
-    } else {
-      products.push(productData);
-    }
-
-    saveToStorage();
-    resetForm();
-    alert("Produto salvo com sucesso!");
+    products.push(newProd);
+    localStorage.setItem("jeci_produtos", JSON.stringify(products));
+    renderTable();
+    this.reset();
+    document.getElementById("previewContainer").innerHTML = "Sem Foto";
+    currentImageData = "";
+    alert("Calçado cadastrado com sucesso!");
   });
 
-  btnExport.addEventListener("click", function() {
+  document.getElementById("btnExport").addEventListener("click", function() {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(products, null, 2));
-    const dlAnchor = document.createElement("a");
-    dlAnchor.setAttribute("href", dataStr);
-    dlAnchor.setAttribute("download", "produtos.json");
-    dlAnchor.click();
-  });
-
-  btnImport.addEventListener("click", () => importInput.click());
-  importInput.addEventListener("change", function(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(ev) {
-      try {
-        products = JSON.parse(ev.target.result);
-        saveToStorage();
-        alert("Catálogo importado com sucesso!");
-      } catch (err) {
-        alert("Arquivo JSON inválido.");
-      }
-    };
-    reader.readAsText(file);
+    const dl = document.createElement("a");
+    dl.setAttribute("href", dataStr);
+    dl.setAttribute("download", "produtos.json");
+    dl.click();
   });
 
   checkSession();

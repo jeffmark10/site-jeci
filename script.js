@@ -3,37 +3,71 @@
 
   const WHATSAPP_NUMBER = "5586981247491";
 
+  // Depoimentos Padrão (incluindo os prints reais do Instagram)
+  const DEFAULT_REVIEWS = [
+    {
+      nome: "xdecora.paper",
+      cidade: "Picos - PI",
+      estrelas: 5,
+      comentario: "Tão perfeitaaa 😍 Sacola + adesivo + mimo! Eu amei amiga ❤️",
+      tag: "Instagram Feedback"
+    },
+    {
+      nome: "Larissa M.",
+      cidade: "Teresina - PI",
+      estrelas: 5,
+      comentario: "A sandália é super confortável, a palmilha é macia e não machuca nada o pé. Atendimento 10 no WhatsApp!",
+      tag: "Cliente Verificada"
+    },
+    {
+      nome: "Bruna S.",
+      cidade: "Brasília - DF",
+      estrelas: 5,
+      comentario: "Chegou super rápido aqui em casa, muito bem embalada e com um cheirinho maravilhoso. Com certeza comprarei mais!",
+      tag: "Cliente Verificada"
+    }
+  ];
+
+  let products = [];
+  let reviews = [];
+
   function formatPrice(val) {
     const parts = Number(val).toFixed(2).split(".");
-    return {
-      inteiro: parts[0],
-      centavos: parts[1]
-    };
+    return { inteiro: parts[0], centavos: parts[1] };
   }
 
   function getWhatsappLink(message) {
     return "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(message);
   }
 
-  function renderProducts(products) {
+  function renderStars(rating) {
+    const full = Math.round(rating || 5);
+    return "★".repeat(full) + "☆".repeat(5 - full);
+  }
+
+  /* =====================================================
+     PRODUTOS EM DESTAQUE
+     ===================================================== */
+  function renderProducts(list) {
     const grid = document.getElementById("productGrid");
     if (!grid) return;
 
     grid.innerHTML = "";
-    const activeProducts = products.filter(p => p.ativo && p.destaque);
+    const activeProducts = list.filter(p => p.ativo && p.destaque);
 
     activeProducts.forEach(prod => {
+      const realIndex = list.findIndex(i => i.id === prod.id);
       const price = formatPrice(prod.preco);
       const article = document.createElement("article");
       article.className = "product-card reveal";
 
-      const msg = `Olá! Tenho interesse no produto:\n\n` +
+      const msg = `Olá! Tenho interesse na sandália:\n\n` +
         `* Código: ${prod.codigo}\n` +
-        `* Item: ${prod.nome}\n` +
+        `* Modelo: ${prod.nome}\n` +
         `* Preço: R$ ${Number(prod.preco).toFixed(2)}\n` +
         `* Tamanhos: ${prod.tamanhos && prod.tamanhos.length > 0 ? prod.tamanhos.join(", ") : "Consulte"}\n` +
         `* Foto: ${prod.imagem.startsWith("data:") ? "[Foto do catálogo]" : prod.imagem}\n\n` +
-        `Gostaria de confirmar a disponibilidade.`;
+        `Gostaria de confirmar a disponibilidade no meu número.`;
 
       article.innerHTML = `
         <div class="product-art-wrapper">
@@ -42,9 +76,16 @@
         <div class="swing-tag product-tag">
           <span class="tag-price">R$${price.inteiro}<sup>,${price.centavos}</sup></span>
         </div>
+        
+        <div class="product-rating-bar" onclick="window.openProductEval(${realIndex})" title="Clique para avaliar este calçado">
+          <span class="stars-val">${renderStars(prod.avaliacao)}</span>
+          <span class="rating-count">(${prod.totalAvaliacoes || 1}) Avaliar</span>
+        </div>
+
         <span class="product-code-badge">${prod.codigo}</span>
         <h3>${prod.nome}</h3>
         <p class="product-desc">${prod.descricao || ""}</p>
+        <p class="product-sizes-badge">Numerações: ${(prod.tamanhos || []).join(", ") || "34 ao 39"}</p>
         <a class="btn btn-whatsapp btn-block js-whatsapp" href="${getWhatsappLink(msg)}" target="_blank" rel="noopener">Comprar no WhatsApp</a>
       `;
 
@@ -54,35 +95,145 @@
     setupScrollReveal();
   }
 
-  async function loadCatalog() {
-    const stored = localStorage.getItem("jeci_produtos");
-    if (stored) {
+  /* =====================================================
+     DEPOIMENTOS & AVALIAÇÕES DA LOJA
+     ===================================================== */
+  function renderReviews() {
+    const grid = document.getElementById("testiGrid");
+    if (!grid) return;
+    grid.innerHTML = "";
+
+    reviews.forEach(r => {
+      const card = document.createElement("blockquote");
+      card.className = "testi-card";
+      card.innerHTML = `
+        <div class="stars">${"★".repeat(r.estrelas || 5)}</div>
+        <p>&ldquo;${r.comentario}&rdquo;</p>
+        <footer>
+          <strong>${r.nome}</strong> &middot; ${r.cidade}
+          ${r.tag ? `<span class="review-verified">${r.tag}</span>` : ""}
+        </footer>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  function setupReviewForms() {
+    // Seletor de estrelas da loja
+    let selectedStars = 5;
+    const starSpans = document.querySelectorAll("#starSelector span");
+    starSpans.forEach(span => {
+      span.addEventListener("click", function() {
+        selectedStars = parseInt(this.getAttribute("data-star"));
+        starSpans.forEach(s => {
+          const val = parseInt(s.getAttribute("data-star"));
+          s.classList.toggle("active", val <= selectedStars);
+        });
+      });
+    });
+
+    // Envio do formulário da loja
+    const storeForm = document.getElementById("storeReviewForm");
+    if (storeForm) {
+      storeForm.addEventListener("submit", function(e) {
+        e.preventDefault();
+        const newRev = {
+          nome: document.getElementById("revName").value.trim(),
+          cidade: document.getElementById("revCity").value.trim(),
+          estrelas: selectedStars,
+          comentario: document.getElementById("revComment").value.trim(),
+          tag: "Nova Avaliação"
+        };
+        reviews.unshift(newRev);
+        localStorage.setItem("jeci_reviews", JSON.stringify(reviews));
+        renderReviews();
+        storeForm.reset();
+        alert("Obrigada pelo seu feedback! Sua avaliação foi adicionada.");
+      });
+    }
+
+    // Modal de avaliação de produto
+    let prodSelectedStars = 5;
+    const prodStarSpans = document.querySelectorAll("#prodStarSelector span");
+    prodStarSpans.forEach(span => {
+      span.addEventListener("click", function() {
+        prodSelectedStars = parseInt(this.getAttribute("data-star"));
+        prodStarSpans.forEach(s => {
+          const val = parseInt(s.getAttribute("data-star"));
+          s.classList.toggle("active", val <= prodSelectedStars);
+        });
+      });
+    });
+
+    window.openProductEval = function(index) {
+      const modal = document.getElementById("productReviewModal");
+      const title = document.getElementById("modalProdTitle");
+      const idxInput = document.getElementById("evalProdIndex");
+      if (!modal || !products[index]) return;
+
+      title.textContent = "Avaliar " + products[index].nome;
+      idxInput.value = index;
+      modal.classList.add("open");
+    };
+
+    const closeBtn = document.getElementById("closeProdModal");
+    if (closeBtn) {
+      closeBtn.addEventListener("click", () => {
+        document.getElementById("productReviewModal").classList.remove("open");
+      });
+    }
+
+    const prodEvalForm = document.getElementById("productEvalForm");
+    if (prodEvalForm) {
+      prodEvalForm.addEventListener("submit", function(e) {
+        e.preventDefault();
+        const idx = parseInt(document.getElementById("evalProdIndex").value);
+        if (!isNaN(idx) && products[idx]) {
+          const currentTotal = products[idx].totalAvaliacoes || 1;
+          const currentRating = products[idx].avaliacao || 5.0;
+          
+          // Média ponderada
+          const newRating = ((currentRating * currentTotal) + prodSelectedStars) / (currentTotal + 1);
+          products[idx].avaliacao = Number(newRating.toFixed(1));
+          products[idx].totalAvaliacoes = currentTotal + 1;
+
+          localStorage.setItem("jeci_produtos", JSON.stringify(products));
+          renderProducts(products);
+          document.getElementById("productReviewModal").classList.remove("open");
+          alert("Nota registrada com sucesso! Obrigada por avaliar.");
+        }
+      });
+    }
+  }
+
+  /* =====================================================
+     CARREGAMENTO INICIAL
+     ===================================================== */
+  async function loadInitialData() {
+    // Avaliações
+    const cachedReviews = localStorage.getItem("jeci_reviews");
+    reviews = cachedReviews ? JSON.parse(cachedReviews) : DEFAULT_REVIEWS;
+    renderReviews();
+    setupReviewForms();
+
+    // Catálogo
+    const storedProds = localStorage.getItem("jeci_produtos");
+    if (storedProds) {
       try {
-        renderProducts(JSON.parse(stored));
+        products = JSON.parse(storedProds);
+        renderProducts(products);
         return;
-      } catch (e) {
-        console.error("Erro ao carregar do cache", e);
-      }
+      } catch (e) {}
     }
 
     try {
       const res = await fetch("produtos.json");
-      if (!res.ok) throw new Error("Falha ao carregar produtos.json");
-      const data = await res.json();
-      localStorage.setItem("jeci_produtos", JSON.stringify(data));
-      renderProducts(data);
+      products = await res.json();
+      localStorage.setItem("jeci_produtos", JSON.stringify(products));
+      renderProducts(products);
     } catch (err) {
-      console.warn("Utilizando carregamento de fallback padrão.");
+      console.warn("Carregando itens padrão.");
     }
-  }
-
-  function buildWhatsappLinks() {
-    const links = document.querySelectorAll(".js-whatsapp:not(.product-card .js-whatsapp)");
-    links.forEach(function (link) {
-      const customMsg = link.getAttribute("data-msg");
-      const message = customMsg || "Olá! Vim pelo site da Jeci Store e quero saber mais.";
-      link.setAttribute("href", getWhatsappLink(message));
-    });
   }
 
   function setupMobileNav() {
@@ -93,14 +244,10 @@
     toggle.addEventListener("click", function () {
       const isOpen = nav.classList.toggle("open");
       toggle.setAttribute("aria-expanded", String(isOpen));
-      toggle.setAttribute("aria-label", isOpen ? "Fechar menu" : "Abrir menu");
     });
 
     nav.querySelectorAll("a").forEach(function (link) {
-      link.addEventListener("click", function () {
-        nav.classList.remove("open");
-        toggle.setAttribute("aria-expanded", "false");
-      });
+      link.addEventListener("click", () => nav.classList.remove("open"));
     });
   }
 
@@ -111,106 +258,38 @@
       if (!button) return;
       button.addEventListener("click", function () {
         const isOpen = item.classList.contains("open");
-
-        items.forEach(function (other) {
-          other.classList.remove("open");
-          const otherBtn = other.querySelector(".faq-question");
-          if (otherBtn) otherBtn.setAttribute("aria-expanded", "false");
-        });
-
-        if (!isOpen) {
-          item.classList.add("open");
-          button.setAttribute("aria-expanded", "true");
-        }
+        items.forEach(other => other.classList.remove("open"));
+        if (!isOpen) item.classList.add("open");
       });
     });
-  }
-
-  function setupHeaderShadow() {
-    const header = document.querySelector(".site-header");
-    if (!header) return;
-    const onScroll = function () {
-      if (window.scrollY > 8) {
-        header.style.boxShadow = "0 8px 20px -14px rgba(46,49,66,0.35)";
-      } else {
-        header.style.boxShadow = "none";
-      }
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
   }
 
   function setupScrollReveal() {
-    const targets = document.querySelectorAll(
-      ".cat-card, .product-card, .dif-card, .testi-card, .about-card"
-    );
-    if (!targets.length) return;
-
-    targets.forEach(function (el) {
-      el.classList.add("reveal");
-    });
-
+    const targets = document.querySelectorAll(".cat-card, .product-card, .testi-card, .about-card");
     if (!("IntersectionObserver" in window)) {
-      targets.forEach(function (el) {
-        el.classList.add("in-view");
-      });
+      targets.forEach(el => el.classList.add("in-view"));
       return;
     }
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("in-view");
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
 
-    const observer = new IntersectionObserver(
-      function (entries) {
-        entries.forEach(function (entry) {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("in-view");
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.15 }
-    );
-
-    targets.forEach(function (el) {
+    targets.forEach(el => {
+      el.classList.add("reveal");
       observer.observe(el);
     });
   }
 
-  function setupAdminShortcuts() {
-    // Atalho: Ctrl + Shift + A
-    window.addEventListener("keydown", function (e) {
-      if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "a") {
-        window.location.href = "admin.html";
-      }
-    });
-
-    // Atalho: 3 cliques rápidos no logo
-    const brand = document.querySelector(".brand");
-    if (brand) {
-      let clicks = 0;
-      let timer;
-      brand.addEventListener("click", function (e) {
-        clicks++;
-        clearTimeout(timer);
-        if (clicks >= 3) {
-          e.preventDefault();
-          window.location.href = "admin.html";
-        }
-        timer = setTimeout(() => { clicks = 0; }, 600);
-      });
-    }
-  }
-
-  function setupYear() {
-    const el = document.getElementById("year");
-    if (el) el.textContent = new Date().getFullYear();
-  }
-
   document.addEventListener("DOMContentLoaded", function () {
-    buildWhatsappLinks();
     setupMobileNav();
     setupFaq();
-    setupHeaderShadow();
-    setupYear();
-    setupAdminShortcuts();
-    loadCatalog();
+    loadInitialData();
+    const yr = document.getElementById("year");
+    if (yr) yr.textContent = new Date().getFullYear();
   });
 })();
