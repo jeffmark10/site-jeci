@@ -66,7 +66,7 @@
     color: #fff;
   }
 
-  /* Área de Upload e Preview da Foto */
+  /* Upload com ImgBB e Status */
   .image-upload-box {
     display: flex;
     gap: 16px;
@@ -90,6 +90,7 @@
   }
   .image-preview-slot img { width: 100%; height: 100%; object-fit: cover; }
   .image-inputs { display: flex; flex-direction: column; gap: 8px; flex-grow: 1; }
+  .upload-status { font-size: 0.82rem; font-weight: 700; color: var(--pink-deep); display: none; }
 
   /* Barra de Pesquisa e Filtros */
   .table-controls { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
@@ -201,13 +202,14 @@
         </div>
 
         <div class="form-group full">
-          <label>Foto do Produto</label>
+          <label>Foto do Produto (Upload Automático)</label>
           <div class="image-upload-box">
             <div class="image-preview-slot" id="previewContainer">
               <span style="font-size:0.75rem; color:var(--body-gray); text-align:center;">Sem Foto</span>
             </div>
             <div class="image-inputs">
               <input type="file" id="imgFile" accept="image/*">
+              <span class="upload-status" id="uploadStatus">⏳ Enviando foto para nuvem...</span>
               <input type="text" id="imgUrl" placeholder="Ou cole a URL direta da imagem">
             </div>
           </div>
@@ -274,9 +276,14 @@
 <script>
 (function() {
   const ADMIN_PASSWORD = "jeci2026";
+  
+  /* =====================================================
+     COLE SUA CHAVE DO IMGBB AQUI:
+     ===================================================== */
+  const IMGBB_API_KEY = "f230f2d81c42c92ba630ff6178c7bf55";
 
   let products = [];
-  let currentImageData = "";
+  let currentImageUrl = "";
 
   const SIZES_CONFIG = {
     "Sandálias": ["34", "35", "36", "37", "38", "39", "40"],
@@ -293,6 +300,7 @@
   const tableBody = document.getElementById("tableBody");
   const fileInput = document.getElementById("imgFile");
   const imgUrlInput = document.getElementById("imgUrl");
+  const uploadStatus = document.getElementById("uploadStatus");
   const previewContainer = document.getElementById("previewContainer");
   const categorySelect = document.getElementById("categoria");
   const skuInput = document.getElementById("codigo");
@@ -304,8 +312,8 @@
   const btnImport = document.getElementById("btnImport");
   const importInput = document.getElementById("importInput");
   const btnCancel = document.getElementById("btnCancel");
+  const btnSave = document.getElementById("btnSave");
 
-  // Sessão
   function checkSession() {
     if (sessionStorage.getItem("jeci_auth") === "true") {
       authOverlay.style.display = "none";
@@ -334,7 +342,6 @@
     window.location.reload();
   });
 
-  // Catálogo
   async function initCatalog() {
     const cached = localStorage.getItem("jeci_produtos");
     if (cached) {
@@ -358,7 +365,6 @@
     renderTable();
   }
 
-  // Alternar Status com 1 Clique
   window.toggleStatus = function(index) {
     products[index].ativo = !products[index].ativo;
     saveToStorage();
@@ -390,42 +396,53 @@
     });
   }
 
-  fileInput.addEventListener("change", function() {
+  /* =====================================================
+     UPLOAD AUTOMÁTICO PARA IMGBB
+     ===================================================== */
+  fileInput.addEventListener("change", async function() {
     const file = this.files[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const img = new Image();
-      img.onload = function() {
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d");
-        const MAX_WIDTH = 700;
-        let width = img.width;
-        let height = img.height;
+    if (!IMGBB_API_KEY || IMGBB_API_KEY === "SUA_CHAVE_API_AQUI") {
+      alert("Por favor, configure sua chave da API do ImgBB no script do admin.html");
+      return;
+    }
 
-        if (width > MAX_WIDTH) {
-          height = Math.round((height * MAX_WIDTH) / width);
-          width = MAX_WIDTH;
-        }
+    uploadStatus.style.display = "block";
+    uploadStatus.textContent = "⏳ Enviando foto para nuvem...";
+    btnSave.disabled = true;
 
-        canvas.width = width;
-        canvas.height = height;
-        ctx.drawImage(img, 0, 0, width, height);
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
 
-        currentImageData = canvas.toDataURL("image/jpeg", 0.82);
-        updatePreview(currentImageData);
-        imgUrlInput.value = "";
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
+      const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await res.json();
+
+      if (data && data.success) {
+        currentImageUrl = data.data.url;
+        imgUrlInput.value = currentImageUrl;
+        updatePreview(currentImageUrl);
+        uploadStatus.textContent = "✅ Imagem enviada com sucesso!";
+      } else {
+        throw new Error(data.error ? data.error.message : "Erro no envio");
+      }
+    } catch (err) {
+      alert("Erro ao fazer upload da imagem: " + err.message);
+      uploadStatus.textContent = "❌ Falha no envio.";
+    } finally {
+      btnSave.disabled = false;
+    }
   });
 
   imgUrlInput.addEventListener("input", function() {
     if (this.value.trim()) {
-      currentImageData = this.value.trim();
-      updatePreview(currentImageData);
+      currentImageUrl = this.value.trim();
+      updatePreview(currentImageUrl);
     }
   });
 
@@ -497,9 +514,10 @@
     renderSizeChips(chipsSelected);
     document.getElementById("tamanhosExtra").value = extraSizes.join(", ");
 
-    currentImageData = p.imagem || "";
-    updatePreview(currentImageData);
-    imgUrlInput.value = currentImageData.startsWith("data:") ? "" : currentImageData;
+    currentImageUrl = p.imagem || "";
+    updatePreview(currentImageUrl);
+    imgUrlInput.value = currentImageUrl;
+    uploadStatus.style.display = "none";
 
     document.getElementById("formTitle").textContent = "Editar Produto: " + p.codigo;
     btnCancel.style.display = "inline-flex";
@@ -520,7 +538,8 @@
     document.getElementById("prodId").value = "";
     document.getElementById("formTitle").textContent = "Adicionar Novo Produto";
     btnCancel.style.display = "none";
-    currentImageData = "";
+    uploadStatus.style.display = "none";
+    currentImageUrl = "";
     updatePreview("");
     renderSizeChips();
     suggestSKU();
@@ -537,7 +556,7 @@
       .filter(s => s.length > 0);
     const allSizes = [...selectedChips, ...extraSizes];
 
-    const finalImg = currentImageData || "https://images.unsplash.com/photo-1562273138-f46be4ebdf33?w=500";
+    const finalImg = currentImageUrl || imgUrlInput.value.trim() || "https://images.unsplash.com/photo-1562273138-f46be4ebdf33?w=500";
 
     const productData = {
       id: editIdx !== "" ? products[editIdx].id : String(Date.now()),

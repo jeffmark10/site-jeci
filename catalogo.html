@@ -289,7 +289,6 @@
     }
   }
 
-  // Links de WhatsApp estáticos
   function setupWhatsappLinks() {
     document.querySelectorAll(".js-whatsapp:not(.product-card .js-whatsapp)").forEach(link => {
       const msg = link.getAttribute("data-msg") || "Olá! Vim pelo site da Jeci Store.";
@@ -297,19 +296,16 @@
     });
   }
 
-  // Eventos de filtro
   searchInput.addEventListener("input", renderGrid);
   categorySelect.addEventListener("change", renderGrid);
   sortSelect.addEventListener("change", renderGrid);
 
-  // Mobile Nav
   const toggle = document.getElementById("navToggle");
   const nav = document.getElementById("mainNav");
   if (toggle && nav) {
     toggle.addEventListener("click", () => nav.classList.toggle("open"));
   }
 
-  // Ano
   const yr = document.getElementById("year");
   if (yr) yr.textContent = new Date().getFullYear();
 

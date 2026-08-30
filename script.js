@@ -27,14 +27,13 @@
       const article = document.createElement("article");
       article.className = "product-card reveal";
 
-      const msg = `Olá! Tenho interesse no produto:
-\u{1F4CC} Código: ${prod.codigo}
-\u{1F457} Item: ${prod.nome}
-\u{1F4B0} Preço: R$ ${Number(prod.preco).toFixed(2)}
-\u{1F4CF} Tamanhos: ${prod.tamanhos && prod.tamanhos.length > 0 ? prod.tamanhos.join(", ") : "Consulte"}
-\u{1F517} Foto: ${prod.imagem.startsWith("data:") ? "[Foto enviada via catálogo online]" : prod.imagem}
-
-Gostaria de confirmar a disponibilidade.`;
+      const msg = `Olá! Tenho interesse no produto:\n\n` +
+        `* Código: ${prod.codigo}\n` +
+        `* Item: ${prod.nome}\n` +
+        `* Preço: R$ ${Number(prod.preco).toFixed(2)}\n` +
+        `* Tamanhos: ${prod.tamanhos && prod.tamanhos.length > 0 ? prod.tamanhos.join(", ") : "Consulte"}\n` +
+        `* Foto: ${prod.imagem.startsWith("data:") ? "[Foto do catálogo]" : prod.imagem}\n\n` +
+        `Gostaria de confirmar a disponibilidade.`;
 
       article.innerHTML = `
         <div class="product-art-wrapper">
