@@ -3,7 +3,6 @@
 
   const WHATSAPP_NUMBER = "5586981247491";
 
-  // Depoimento real do Instagram
   const DEFAULT_REVIEWS = [
     {
       nome: "xdecora.paper",
@@ -26,8 +25,13 @@
     return "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(message);
   }
 
+  function renderStars(rating) {
+    const full = Math.round(rating || 5);
+    return "★".repeat(full) + "☆".repeat(5 - full);
+  }
+
   /* =====================================================
-     RENDERIZAÇÃO DE PRODUTOS
+     RENDERIZAÇÃO DOS DESTAQUES
      ===================================================== */
   function renderProducts(list) {
     const grid = document.getElementById("productGrid");
@@ -41,12 +45,18 @@
       const article = document.createElement("article");
       article.className = "product-card reveal";
 
+      const evals = prod.avaliacoes_produtos || [];
+      const totalRatings = evals.length;
+      const avgRating = totalRatings > 0 
+        ? evals.reduce((sum, e) => sum + e.estrelas, 0) / totalRatings 
+        : 5.0;
+
       const msg = `Olá! Tenho interesse na sandália:\n\n` +
         `* Código: ${prod.codigo}\n` +
         `* Modelo: ${prod.nome}\n` +
         `* Preço: R$ ${Number(prod.preco).toFixed(2)}\n` +
         `* Foto: ${prod.imagem}\n\n` +
-        `Gostaria de ver a disponibilidade no meu número.`;
+        `Gostaria de confirmar a disponibilidade no meu número.`;
 
       article.innerHTML = `
         <div class="product-art-wrapper">
@@ -58,9 +68,9 @@
           <span class="tag-price">R$${price.inteiro}<sup>,${price.centavos}</sup></span>
         </div>
         
-        <a href="produto.html?id=${prod.id}" class="product-rating-bar" title="Ver avaliações deste modelo">
-          <span class="stars-val">★★★★★</span>
-          <span class="rating-count">Ver detalhes & avaliações →</span>
+        <a href="produto.html?id=${prod.id}" class="product-rating-bar" title="Ver avaliações">
+          <span class="stars-val">${renderStars(avgRating)}</span>
+          <span class="rating-count">(${totalRatings}) Ver detalhes →</span>
         </a>
 
         <span class="product-code-badge">${prod.codigo}</span>
@@ -70,7 +80,7 @@
         
         <div style="display:flex; gap:8px; margin-top:auto;">
           <a class="btn btn-whatsapp btn-block js-whatsapp" href="${getWhatsappLink(msg)}" target="_blank" rel="noopener">Comprar</a>
-          <a class="btn btn-outline" href="produto.html?id=${prod.id}" style="padding:10px 14px;">🔍</a>
+          <a class="btn btn-outline" href="produto.html?id=${prod.id}" style="padding:10px 14px;" title="Ver produto">🔍</a>
         </div>
       `;
 
@@ -113,9 +123,9 @@
     }
     renderReviews();
 
-    // 2. Produtos
+    // 2. Produtos com Avaliações Relacionais
     if (db) {
-      const { data } = await db.from("produtos").select("*").order("created_at", { ascending: false });
+      const { data } = await db.from("produtos").select("*, avaliacoes_produtos(estrelas)").order("created_at", { ascending: false });
       if (data && data.length) {
         products = data;
         localStorage.setItem("jeci_produtos", JSON.stringify(products));
@@ -138,7 +148,7 @@
     } catch (e) {}
   }
 
-  // Formulário de feedback
+  // Formulário de feedback público
   let storeStars = 5;
   const starBtns = document.querySelectorAll("#starSelector span");
   starBtns.forEach(s => {
@@ -171,7 +181,7 @@
       localStorage.setItem("jeci_reviews", JSON.stringify(reviews));
       renderReviews();
       storeForm.reset();
-      alert("Obrigada pelo carinho! Seu feedback foi adicionado.");
+      alert("Obrigada pelo feedback! Sua avaliação foi publicada.");
     });
   }
 

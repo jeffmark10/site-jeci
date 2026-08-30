@@ -6,188 +6,294 @@
 <title>Painel Administrativo | Jeci Store</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
 <style>
   body { background: var(--cream); padding: 30px 0; min-height: 100vh; }
-  .admin-wrap { max-width: 960px; margin: 0 auto; padding: 0 20px; }
+  .admin-wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
   
+  /* Modal de Login */
   .auth-overlay {
     position: fixed; inset: 0; background: var(--cream);
     display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
   }
   .auth-card {
-    background: var(--paper); border-radius: 20px; padding: 36px 28px;
+    background: var(--paper); border-radius: var(--radius-lg); padding: 40px 32px;
     max-width: 400px; width: 100%; box-shadow: var(--shadow-soft);
-    border: 1px solid rgba(226,78,138,0.18); text-align: center;
+    border: 1.5px solid rgba(227,73,136,0.18); text-align: center;
   }
-  .auth-error { color: #dc3545; font-size: 0.85rem; font-weight: 700; margin-top: 10px; display: none; }
+  .auth-error { color: #dc3545; font-size: 0.88rem; font-weight: 700; margin-top: 12px; display: none; }
 
-  .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
-  .admin-card { background: var(--paper); border-radius: 16px; padding: 24px; box-shadow: var(--shadow-tag); margin-bottom: 24px; border: 1px solid rgba(226,78,138,0.12); }
-  .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  /* Estrutura do Painel */
+  .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 14px; }
+  .admin-card { background: var(--paper); border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow-card); margin-bottom: 26px; border: 1.5px solid rgba(227,73,136,0.12); }
+  
+  /* Navegação em Abas */
+  .admin-tabs {
+    display: flex; gap: 10px; margin-bottom: 24px; border-bottom: 2px solid rgba(227,73,136,0.15); padding-bottom: 12px; flex-wrap: wrap;
+  }
+  .tab-btn {
+    padding: 10px 22px; border-radius: 999px; font-weight: 700; font-size: 0.92rem;
+    color: var(--body-gray); background: var(--paper); border: 1.5px solid rgba(42,40,56,0.12);
+    cursor: pointer; transition: all 0.25s ease;
+  }
+  .tab-btn:hover { border-color: var(--pink-deep); color: var(--pink-deep); }
+  .tab-btn.active { background: var(--pink-deep); color: #fff; border-color: var(--pink-deep); box-shadow: var(--shadow-soft); }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Formulário de Calçados */
+  .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
   .form-group { display: flex; flex-direction: column; gap: 6px; }
   .form-group.full { grid-column: span 2; }
-  label { font-weight: 700; font-size: 0.85rem; color: var(--ink); }
-  input, select, textarea { font-family: inherit; font-size: 0.95rem; padding: 10px 14px; border: 1.5px solid rgba(46,49,66,0.15); border-radius: 8px; outline: none; }
+  label { font-weight: 700; font-size: 0.88rem; color: var(--ink); }
+  input, select, textarea { font-family: inherit; font-size: 0.95rem; padding: 11px 14px; border: 1.5px solid rgba(42,40,56,0.15); border-radius: 10px; outline: none; background: #fff; }
+  input:focus, select:focus, textarea:focus { border-color: var(--pink-deep); }
   
   .size-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
   .size-chip {
-    padding: 6px 14px; border-radius: 20px; border: 1.5px solid rgba(46,49,66,0.2);
-    font-size: 0.85rem; font-weight: 700; cursor: pointer; user-select: none;
+    padding: 7px 16px; border-radius: 20px; border: 1.5px solid rgba(42,40,56,0.2);
+    font-size: 0.85rem; font-weight: 700; cursor: pointer; user-select: none; transition: all 0.2s;
   }
-  .size-chip.selected { background: var(--pink-deep); border-color: var(--pink-deep); color: #fff; }
+  .size-chip.selected { background: var(--pink-deep); border-color: var(--pink-deep); color: #fff; transform: scale(1.05); }
 
   .image-upload-box {
-    display: flex; gap: 16px; align-items: center; border: 1.5px dashed rgba(226,78,138,0.4);
-    padding: 14px; border-radius: 10px; background: var(--cream);
+    display: flex; gap: 16px; align-items: center; border: 1.5px dashed rgba(227,73,136,0.4);
+    padding: 16px; border-radius: 12px; background: var(--cream);
   }
   .image-preview-slot {
-    width: 80px; height: 80px; border-radius: 8px; background: #fff;
-    border: 1px solid rgba(46,49,66,0.1); display: flex; align-items: center; justify-content: center; overflow: hidden;
+    width: 84px; height: 84px; border-radius: 10px; background: #fff;
+    border: 1px solid rgba(42,40,56,0.1); display: flex; align-items: center; justify-content: center; overflow: hidden;
   }
   .image-preview-slot img { width: 100%; height: 100%; object-fit: cover; }
   .image-inputs { display: flex; flex-direction: column; gap: 8px; flex-grow: 1; }
 
+  /* Tabelas */
   .table-responsive { overflow-x: auto; }
   table { width: 100%; border-collapse: collapse; text-align: left; margin-top: 14px; }
-  th, td { padding: 12px; border-bottom: 1px solid rgba(46,49,66,0.08); font-size: 0.9rem; vertical-align: middle; }
-  th { background: var(--pink-light); color: var(--pink-deep); }
+  th, td { padding: 14px 12px; border-bottom: 1px solid rgba(42,40,56,0.08); font-size: 0.92rem; vertical-align: middle; }
+  th { background: var(--pink-light); color: var(--pink-deep); font-family: var(--font-display); }
   
   .status-btn {
-    padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; cursor: pointer; border: none;
+    padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 800; cursor: pointer; border: none; transition: transform 0.2s;
   }
+  .status-btn:hover { transform: scale(1.05); }
   .status-btn.active { background: #d4edda; color: #155724; }
   .status-btn.inactive { background: #f8d7da; color: #721c24; }
-  .preview-thumb { width: 46px; height: 46px; object-fit: cover; border-radius: 6px; }
+  .preview-thumb { width: 48px; height: 48px; object-fit: cover; border-radius: 8px; }
+
+  /* Cards de Estatísticas */
+  .stat-badge {
+    display: inline-block; background: var(--pink-light); color: var(--pink-deep);
+    padding: 4px 12px; border-radius: 20px; font-weight: 800; font-size: 0.82rem; margin-left: 8px;
+  }
+  .rating-stars { color: #f59e0b; font-size: 1rem; letter-spacing: 1px; }
+  .btn-delete-rev { color: #dc3545; border-color: #dc3545; padding: 6px 12px; font-size: 0.82rem; }
+  .btn-delete-rev:hover { background: #dc3545; color: #fff; }
 </style>
 </head>
 <body>
 
+<!-- MODAL DE AUTENTICAÇÃO -->
 <div class="auth-overlay" id="authOverlay">
   <div class="auth-card">
-    <span class="brand-script" style="font-size: 2.5rem; color: var(--pink-deep); display: block; margin-bottom: 8px;">Js</span>
-    <h2>Painel da Loja</h2>
-    <p>Digite a senha administrativa:</p>
+    <span class="brand-script" style="font-size: 3rem; color: var(--pink-deep); display: block; margin-bottom: 8px;">Js</span>
+    <h2>Área Restrita</h2>
+    <p>Digite a senha administrativa da Jeci Store:</p>
     <form id="authForm">
-      <input type="password" id="adminPass" placeholder="••••••••" required style="width: 100%; margin-bottom: 14px; padding: 10px;">
-      <button type="submit" class="btn btn-whatsapp btn-block">Entrar</button>
-      <p class="auth-error" id="authError">Senha incorreta.</p>
+      <input type="password" id="adminPass" placeholder="••••••••" required style="width: 100%; margin-bottom: 14px; padding: 12px; text-align: center;">
+      <button type="submit" class="btn btn-whatsapp btn-block">Entrar no Painel</button>
+      <p class="auth-error" id="authError">Senha incorreta. Tente novamente.</p>
     </form>
   </div>
 </div>
 
+<!-- CONTEÚDO DO PAINEL -->
 <div class="admin-wrap" id="adminContent" style="display: none;">
   <div class="admin-header">
     <div>
-      <h1>Gerenciador de Calçados</h1>
-      <p>Catálogo em Nuvem (Supabase & ImgBB)</p>
+      <h1>Painel de Controle 👡</h1>
+      <p>Gerencie calçados, fotos e modere avaliações</p>
     </div>
-    <div style="display:flex; gap:10px;">
-      <a href="index.html" class="btn btn-outline btn-sm">← Loja</a>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <a href="index.html" class="btn btn-outline btn-sm">← Ver Loja</a>
       <button id="btnExport" class="btn btn-whatsapp btn-sm">📥 Baixar produtos.json</button>
       <button id="btnLogout" class="btn btn-ghost btn-sm">Sair 🚪</button>
     </div>
   </div>
 
-  <div class="admin-card">
-    <h2 id="formTitle">Novo Calçado</h2>
-    <form id="productForm">
-      <input type="hidden" id="prodId">
-      
-      <div class="form-grid">
-        <div class="form-group">
-          <label for="categoria">Categoria de Calçado *</label>
-          <select id="categoria" required>
-            <option value="Sandálias">Sandálias</option>
-            <option value="Rasteiras">Rasteiras</option>
-            <option value="Papetes">Papetes</option>
-            <option value="Saltos">Saltos & Blocos</option>
-            <option value="Sapatilhas">Sapatilhas</option>
-          </select>
-        </div>
+  <!-- NAVEGAÇÃO ENTRE ABAS -->
+  <div class="admin-tabs">
+    <button class="tab-btn active" onclick="switchTab('tab-calcados')">📦 Calçados</button>
+    <button class="tab-btn" onclick="switchTab('tab-avaliacoes-produtos')">⭐ Avaliações dos Calçados <span class="stat-badge" id="badgeCountProdReviews">0</span></button>
+    <button class="tab-btn" onclick="switchTab('tab-depoimentos-loja')">💬 Feedbacks da Loja <span class="stat-badge" id="badgeCountStoreReviews">0</span></button>
+  </div>
 
-        <div class="form-group">
-          <label for="codigo">Código SKU *</label>
-          <input type="text" id="codigo" placeholder="ex: SAN-001" required>
-        </div>
-
-        <div class="form-group">
-          <label for="nome">Nome do Modelo *</label>
-          <input type="text" id="nome" placeholder="ex: Sandália Rasteira Cristal" required>
-        </div>
-
-        <div class="form-group">
-          <label for="preco">Preço (R$) *</label>
-          <input type="number" id="preco" step="0.01" placeholder="89.90" required>
-        </div>
-
-        <div class="form-group full">
-          <label>Numerações Disponíveis</label>
-          <div class="size-chips" id="sizeChipsContainer">
-            <span class="size-chip selected">34</span>
-            <span class="size-chip selected">35</span>
-            <span class="size-chip selected">36</span>
-            <span class="size-chip selected">37</span>
-            <span class="size-chip selected">38</span>
-            <span class="size-chip selected">39</span>
-            <span class="size-chip">40</span>
+  <!-- ==================== ABA 1: CALÇADOS ==================== -->
+  <div class="tab-content active" id="tab-calcados">
+    <div class="admin-card">
+      <h2 id="formTitle">Novo Calçado</h2>
+      <form id="productForm">
+        <input type="hidden" id="prodId">
+        
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="categoria">Categoria *</label>
+            <select id="categoria" required>
+              <option value="Sandálias">Sandálias</option>
+              <option value="Rasteiras">Rasteiras</option>
+              <option value="Papetes">Papetes</option>
+              <option value="Saltos">Saltos & Blocos</option>
+              <option value="Sapatilhas">Sapatilhas</option>
+            </select>
           </div>
-        </div>
 
-        <div class="form-group full">
-          <label>Foto do Calçado (Upload Automático ImgBB)</label>
-          <div class="image-upload-box">
-            <div class="image-preview-slot" id="previewContainer">Sem Foto</div>
-            <div class="image-inputs">
-              <input type="file" id="imgFile" accept="image/*">
-              <span id="uploadStatus" style="font-size:0.8rem; font-weight:700; color:var(--pink-deep); display:none;"></span>
-              <input type="text" id="imgUrl" placeholder="Ou cole a URL direta da imagem">
+          <div class="form-group">
+            <label for="codigo">Código SKU *</label>
+            <input type="text" id="codigo" placeholder="ex: SAN-001" required>
+          </div>
+
+          <div class="form-group">
+            <label for="nome">Nome do Modelo *</label>
+            <input type="text" id="nome" placeholder="ex: Sandália Rasteira Cristal" required>
+          </div>
+
+          <div class="form-group">
+            <label for="preco">Preço (R$) *</label>
+            <input type="number" id="preco" step="0.01" placeholder="89.90" required>
+          </div>
+
+          <div class="form-group full">
+            <label>Numerações Disponíveis</label>
+            <div class="size-chips" id="sizeChipsContainer">
+              <span class="size-chip selected">34</span>
+              <span class="size-chip selected">35</span>
+              <span class="size-chip selected">36</span>
+              <span class="size-chip selected">37</span>
+              <span class="size-chip selected">38</span>
+              <span class="size-chip selected">39</span>
+              <span class="size-chip">40</span>
             </div>
           </div>
+
+          <div class="form-group full">
+            <label>Foto do Calçado (Upload Automático ImgBB)</label>
+            <div class="image-upload-box">
+              <div class="image-preview-slot" id="previewContainer">
+                <span style="font-size:0.75rem; color:var(--body-gray);">Sem Foto</span>
+              </div>
+              <div class="image-inputs">
+                <input type="file" id="imgFile" accept="image/*">
+                <span id="uploadStatus" style="font-size:0.82rem; font-weight:700; color:var(--pink-deep); display:none;"></span>
+                <input type="text" id="imgUrl" placeholder="Ou cole a URL direta da imagem">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group full">
+            <label for="descricao">Descrição (Palmilha, conforto, detalhes...)</label>
+            <textarea id="descricao" rows="2" placeholder="Detalhes do calçado, acabamento, palmilha macia..."></textarea>
+          </div>
+
+          <div class="form-group full" style="display:flex; gap:24px;">
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+              <input type="checkbox" id="destaque" checked> Exibir nos Destaques
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+              <input type="checkbox" id="ativo" checked> Calçado Disponível
+            </label>
+          </div>
         </div>
 
-        <div class="form-group full">
-          <label for="descricao">Descrição</label>
-          <textarea id="descricao" rows="2" placeholder="Palmilha, solado, acabamento..."></textarea>
+        <div style="margin-top: 22px; display: flex; gap: 10px;">
+          <button type="submit" class="btn btn-whatsapp" id="btnSave">Salvar Calçado</button>
+          <button type="button" class="btn btn-outline" id="btnCancel" style="display:none;" onclick="window.resetAdminForm()">Cancelar Edição</button>
         </div>
+      </form>
+    </div>
 
-        <div class="form-group full" style="display:flex; gap:24px;">
-          <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-            <input type="checkbox" id="destaque" checked> Exibir nos Destaques
-          </label>
-          <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-            <input type="checkbox" id="ativo" checked> Calçado Disponível
-          </label>
-        </div>
+    <div class="admin-card">
+      <h2>Calçados Cadastrados</h2>
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Foto</th>
+              <th>Código</th>
+              <th>Modelo</th>
+              <th>Preço</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tableBodyProducts"></tbody>
+        </table>
       </div>
-
-      <div style="margin-top: 20px; display: flex; gap: 10px;">
-        <button type="submit" class="btn btn-whatsapp" id="btnSave">Salvar no Supabase</button>
-      </div>
-    </form>
-  </div>
-
-  <div class="admin-card">
-    <h2>Calçados Cadastrados</h2>
-    <div class="table-responsive">
-      <table>
-        <thead>
-          <tr>
-            <th>Foto</th>
-            <th>Código</th>
-            <th>Modelo</th>
-            <th>Preço</th>
-            <th>Status</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody"></tbody>
-      </table>
     </div>
   </div>
+
+  <!-- ==================== ABA 2: AVALIAÇÕES DOS CALÇADOS ==================== -->
+  <div class="tab-content" id="tab-avaliacoes-produtos">
+    <div class="admin-card">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <h2>Moderação de Avaliações por Calçado</h2>
+        <button class="btn btn-outline btn-sm" onclick="loadProductReviews()">🔄 Atualizar</button>
+      </div>
+      <p style="margin-bottom:18px;">Gerencie e exclua notas ou comentários enviados por clientes na página de cada produto.</p>
+      
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Calçado</th>
+              <th>Cliente</th>
+              <th>Nota</th>
+              <th>Comentário</th>
+              <th>Data</th>
+              <th>Ação</th>
+            </tr>
+          </thead>
+          <tbody id="tableBodyProdReviews">
+            <tr><td colspan="6" style="text-align:center; color:var(--body-gray);">Carregando avaliações...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== ABA 3: FEEDBACKS DA LOJA ==================== -->
+  <div class="tab-content" id="tab-depoimentos-loja">
+    <div class="admin-card">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <h2>Moderação de Feedbacks Gerais da Loja</h2>
+        <button class="btn btn-outline btn-sm" onclick="loadStoreReviews()">🔄 Atualizar</button>
+      </div>
+      <p style="margin-bottom:18px;">Depoimentos que aparecem na página inicial da Jeci Store.</p>
+      
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Cliente</th>
+              <th>Cidade / UF</th>
+              <th>Nota</th>
+              <th>Depoimento</th>
+              <th>Selo</th>
+              <th>Ação</th>
+            </tr>
+          </thead>
+          <tbody id="tableBodyStoreReviews">
+            <tr><td colspan="6" style="text-align:center; color:var(--body-gray);">Carregando depoimentos...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -196,13 +302,27 @@
   const IMGBB_API_KEY = "f230f2d81c42c92ba630ff6178c7bf55";
 
   let products = [];
+  let productReviews = [];
+  let storeReviews = [];
   let currentImageUrl = "";
+
+  /* CONTROLE DE ABAS */
+  window.switchTab = function(tabId) {
+    document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+    document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+    
+    document.querySelector(`[onclick="switchTab('${tabId}')"]`).classList.add("active");
+    document.getElementById(tabId).classList.add("active");
+
+    if (tabId === "tab-avaliacoes-produtos") loadProductReviews();
+    if (tabId === "tab-depoimentos-loja") loadStoreReviews();
+  };
 
   function checkSession() {
     if (sessionStorage.getItem("jeci_auth") === "true") {
       document.getElementById("authOverlay").style.display = "none";
       document.getElementById("adminContent").style.display = "block";
-      initCatalog();
+      initAdmin();
     }
   }
 
@@ -221,7 +341,14 @@
     window.location.reload();
   });
 
-  async function initCatalog() {
+  async function initAdmin() {
+    await loadProducts();
+    await loadProductReviews();
+    await loadStoreReviews();
+  }
+
+  /* ==================== 1. CALÇADOS ==================== */
+  async function loadProducts() {
     if (db) {
       const { data } = await db.from("produtos").select("*").order("created_at", { ascending: false });
       if (data) products = data;
@@ -229,23 +356,23 @@
       products = JSON.parse(localStorage.getItem("jeci_produtos") || "[]");
     }
     setupSizeChips();
-    renderTable();
+    renderProductsTable();
   }
 
-  function setupSizeChips() {
+  function setupSizeChips(selectedList = ["34","35","36","37","38","39"]) {
     document.querySelectorAll(".size-chip").forEach(c => {
-      c.addEventListener("click", () => c.classList.toggle("selected"));
+      c.classList.toggle("selected", selectedList.includes(c.textContent.trim()));
+      c.onclick = () => c.classList.toggle("selected");
     });
   }
 
-  // Upload ImgBB
   document.getElementById("imgFile").addEventListener("change", async function() {
     const file = this.files[0];
     if (!file) return;
 
     const statusEl = document.getElementById("uploadStatus");
     statusEl.style.display = "block";
-    statusEl.textContent = "⏳ Enviando foto para o ImgBB...";
+    statusEl.textContent = "⏳ Enviando foto para nuvem...";
 
     try {
       const fd = new FormData();
@@ -256,18 +383,18 @@
         currentImageUrl = d.data.url;
         document.getElementById("imgUrl").value = currentImageUrl;
         document.getElementById("previewContainer").innerHTML = `<img src="${currentImageUrl}">`;
-        statusEl.textContent = "✅ Foto enviada!";
+        statusEl.textContent = "✅ Imagem salva com sucesso!";
       } else {
         throw new Error(d.error.message);
       }
     } catch (err) {
-      alert("Erro no upload da imagem: " + err.message);
-      statusEl.textContent = "❌ Falha no envio.";
+      alert("Erro no upload: " + err.message);
+      statusEl.textContent = "❌ Falha no upload.";
     }
   });
 
-  function renderTable() {
-    const tbody = document.getElementById("tableBody");
+  function renderProductsTable() {
+    const tbody = document.getElementById("tableBodyProducts");
     tbody.innerHTML = "";
     products.forEach((p, idx) => {
       const tr = document.createElement("tr");
@@ -275,19 +402,55 @@
         <td><img src="${p.imagem}" class="preview-thumb"></td>
         <td><strong>${p.codigo}</strong></td>
         <td>${p.nome}</td>
-        <td>R$ ${Number(p.preco).toFixed(2)}</td>
+        <td>R$ ${Number(p.preco).toFixed(2).replace('.', ',')}</td>
         <td>
           <button class="status-btn ${p.ativo ? 'active' : 'inactive'}" onclick="window.toggleStatus(${idx})">
             ${p.ativo ? '✅ Ativo' : '⏸️ Pausado'}
           </button>
         </td>
         <td>
-          <button class="btn btn-outline btn-sm" onclick="window.deleteProduct('${p.id}', ${idx})">Excluir</button>
+          <button class="btn btn-outline btn-sm" onclick="window.editProduct(${idx})">Editar</button>
+          <button class="btn btn-outline btn-sm" style="color:#dc3545; border-color:#dc3545;" onclick="window.deleteProduct('${p.id}', ${idx})">Excluir</button>
         </td>
       `;
       tbody.appendChild(tr);
     });
   }
+
+  window.editProduct = function(idx) {
+    const p = products[idx];
+    document.getElementById("prodId").value = p.id;
+    document.getElementById("codigo").value = p.codigo;
+    document.getElementById("categoria").value = p.categoria;
+    document.getElementById("nome").value = p.nome;
+    document.getElementById("preco").value = p.preco;
+    document.getElementById("descricao").value = p.descricao || "";
+    document.getElementById("destaque").checked = p.destaque;
+    document.getElementById("ativo").checked = p.ativo;
+
+    const sizes = Array.isArray(p.tamanhos) ? p.tamanhos : [];
+    setupSizeChips(sizes);
+
+    currentImageUrl = p.imagem || "";
+    document.getElementById("imgUrl").value = currentImageUrl;
+    document.getElementById("previewContainer").innerHTML = currentImageUrl ? `<img src="${currentImageUrl}">` : `<span style="font-size:0.75rem; color:var(--body-gray);">Sem Foto</span>`;
+
+    document.getElementById("formTitle").textContent = "Editar Calçado: " + p.codigo;
+    document.getElementById("btnSave").textContent = "Atualizar Calçado";
+    document.getElementById("btnCancel").style.display = "inline-flex";
+    window.scrollTo({ top: document.getElementById("productForm").offsetTop - 40, behavior: "smooth" });
+  };
+
+  window.resetAdminForm = function() {
+    document.getElementById("productForm").reset();
+    document.getElementById("prodId").value = "";
+    document.getElementById("formTitle").textContent = "Novo Calçado";
+    document.getElementById("btnSave").textContent = "Salvar Calçado";
+    document.getElementById("btnCancel").style.display = "none";
+    document.getElementById("previewContainer").innerHTML = `<span style="font-size:0.75rem; color:var(--body-gray);">Sem Foto</span>`;
+    currentImageUrl = "";
+    setupSizeChips(["34","35","36","37","38","39"]);
+  };
 
   window.toggleStatus = async function(idx) {
     products[idx].ativo = !products[idx].ativo;
@@ -295,26 +458,28 @@
       await db.from("produtos").update({ ativo: products[idx].ativo }).eq("id", products[idx].id);
     }
     localStorage.setItem("jeci_produtos", JSON.stringify(products));
-    renderTable();
+    renderProductsTable();
   };
 
   window.deleteProduct = async function(id, idx) {
-    if (confirm("Excluir este calçado?")) {
+    if (confirm("Deseja realmente excluir este calçado e todas as suas avaliações?")) {
       if (db) {
         await db.from("produtos").delete().eq("id", id);
       }
       products.splice(idx, 1);
       localStorage.setItem("jeci_produtos", JSON.stringify(products));
-      renderTable();
+      renderProductsTable();
+      loadProductReviews();
     }
   };
 
   document.getElementById("productForm").addEventListener("submit", async function(e) {
     e.preventDefault();
-    const sizes = Array.from(document.querySelectorAll(".size-chip.selected")).map(c => c.textContent);
+    const existingId = document.getElementById("prodId").value;
+    const sizes = Array.from(document.querySelectorAll(".size-chip.selected")).map(c => c.textContent.trim());
     
-    const newProd = {
-      id: String(Date.now()),
+    const prodData = {
+      id: existingId || String(Date.now()),
       codigo: document.getElementById("codigo").value.trim().toUpperCase(),
       categoria: document.getElementById("categoria").value,
       nome: document.getElementById("nome").value.trim(),
@@ -327,18 +492,107 @@
     };
 
     if (db) {
-      await db.from("produtos").insert([newProd]);
+      await db.from("produtos").upsert([prodData]);
     }
 
-    products.unshift(newProd);
+    if (existingId) {
+      const idx = products.findIndex(p => p.id === existingId);
+      if (idx !== -1) products[idx] = prodData;
+    } else {
+      products.unshift(prodData);
+    }
+
     localStorage.setItem("jeci_produtos", JSON.stringify(products));
-    renderTable();
-    this.reset();
-    document.getElementById("previewContainer").innerHTML = "Sem Foto";
-    currentImageUrl = "";
-    alert("Calçado cadastrado com sucesso!");
+    renderProductsTable();
+    window.resetAdminForm();
+    alert("Calçado salvo com sucesso!");
   });
 
+  /* ==================== 2. AVALIAÇÕES DOS PRODUTOS ==================== */
+  window.loadProductReviews = async function() {
+    const tbody = document.getElementById("tableBodyProdReviews");
+    if (db) {
+      const { data } = await db.from("avaliacoes_produtos").select("*, produtos(nome, codigo)").order("created_at", { ascending: false });
+      productReviews = data || [];
+    }
+    
+    document.getElementById("badgeCountProdReviews").textContent = productReviews.length;
+    tbody.innerHTML = "";
+
+    if (productReviews.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--body-gray); padding:24px;">Nenhuma avaliação de calçado recebida ainda.</td></tr>`;
+      return;
+    }
+
+    productReviews.forEach(r => {
+      const prodName = r.produtos ? `${r.produtos.nome} (${r.produtos.codigo})` : `ID: ${r.produto_id}`;
+      const dataStr = r.created_at ? new Date(r.created_at).toLocaleDateString('pt-BR') : "Recente";
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td><strong>${prodName}</strong></td>
+        <td>${r.nome_cliente}</td>
+        <td><span class="rating-stars">${"★".repeat(r.estrelas)}</span></td>
+        <td><em>"${r.comentario || 'Sem comentário'}"</em></td>
+        <td><small>${dataStr}</small></td>
+        <td>
+          <button class="btn btn-outline btn-sm btn-delete-rev" onclick="window.deleteProductReview('${r.id}')">Excluir</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  };
+
+  window.deleteProductReview = async function(reviewId) {
+    if (confirm("Excluir esta avaliação de produto?")) {
+      if (db) {
+        await db.from("avaliacoes_produtos").delete().eq("id", reviewId);
+      }
+      loadProductReviews();
+    }
+  };
+
+  /* ==================== 3. DEPOIMENTOS DA LOJA ==================== */
+  window.loadStoreReviews = async function() {
+    const tbody = document.getElementById("tableBodyStoreReviews");
+    if (db) {
+      const { data } = await db.from("depoimentos_loja").select("*").order("created_at", { ascending: false });
+      storeReviews = data || [];
+    }
+
+    document.getElementById("badgeCountStoreReviews").textContent = storeReviews.length;
+    tbody.innerHTML = "";
+
+    if (storeReviews.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--body-gray); padding:24px;">Nenhum feedback de cliente cadastrado.</td></tr>`;
+      return;
+    }
+
+    storeReviews.forEach(r => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td><strong>${r.nome}</strong></td>
+        <td>${r.cidade || '—'}</td>
+        <td><span class="rating-stars">${"★".repeat(r.estrelas || 5)}</span></td>
+        <td>"${r.comentario}"</td>
+        <td><span class="stat-badge">${r.tag || 'Depoimento'}</span></td>
+        <td>
+          <button class="btn btn-outline btn-sm btn-delete-rev" onclick="window.deleteStoreReview('${r.id}')">Excluir</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  };
+
+  window.deleteStoreReview = async function(reviewId) {
+    if (confirm("Excluir este depoimento da loja?")) {
+      if (db) {
+        await db.from("depoimentos_loja").delete().eq("id", reviewId);
+      }
+      loadStoreReviews();
+    }
+  };
+
+  /* EXPORTAÇÃO JSON */
   document.getElementById("btnExport").addEventListener("click", function() {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(products, null, 2));
     const dl = document.createElement("a");
