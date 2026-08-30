@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Detalhes do Calçado | Jeci Store</title>
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2250%22 fill=%22%23F2A9C7%22/><text x=%2250%22 y=%2266%22 font-size=%2248%22 fill=%22%23fff%22 text-anchor=%22middle%22 font-family=%22Georgia%22 font-style=%22italic%22>Js</text></svg>">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&family=Pinyon+Script&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<style>
+  .product-details-wrap { display: grid; grid-template-columns: 1fr 1.1fr; gap: 40px; margin-top: 36px; }
+  .product-gallery-card {
+    background: var(--paper); border-radius: var(--radius); padding: 18px;
+    border: 1.5px solid rgba(226,78,138,0.15); box-shadow: var(--shadow-soft);
+    position: relative; overflow: hidden;
+  }
+  .product-gallery-card img { width: 100%; border-radius: 14px; object-fit: cover; aspect-ratio: 1/1; }
+  
+  .product-info-panel h1 { font-size: 2.1rem; margin-bottom: 6px; }
+  .product-info-price { font-size: 2rem; font-weight: 800; color: var(--pink-deep); margin-bottom: 18px; font-family: var(--font-display); }
+  
+  .sizes-selector-box { margin: 20px 0; }
+  .sizes-chips-list { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+  .size-btn {
+    border: 1.5px solid rgba(46,49,66,0.2); background: #fff; padding: 8px 16px;
+    border-radius: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+  }
+  .size-btn.selected, .size-btn:hover { background: var(--pink-deep); color: #fff; border-color: var(--pink-deep); transform: scale(1.05); }
+
+  .reviews-section { margin-top: 60px; }
+  .reviews-list { display: flex; flex-direction: column; gap: 14px; margin-top: 20px; }
+  .review-item-card {
+    background: var(--cream); border-radius: 14px; padding: 18px 20px;
+    border: 1px solid rgba(226,78,138,0.12);
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html">
+      <span class="brand-word">
+        <em class="brand-script">Js</em>
+        <span class="brand-name">Jeci Store</span>
+      </span>
+    </a>
+    <nav class="main-nav" id="mainNav">
+      <a href="index.html">Início</a>
+      <a href="catalogo.html">Catálogo Completo</a>
+      <a href="index.html#depoimentos">Feedbacks</a>
+    </nav>
+    <div class="header-actions">
+      <a class="btn btn-outline btn-sm" href="catalogo.html">← Voltar</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap" style="padding-bottom: 80px;">
+  <div class="product-details-wrap" id="productDetails">
+    <div class="product-gallery-card">
+      <img id="prodImage" src="" alt="Calçado">
+      <span class="cute-sparkle">✨</span>
+    </div>
+    <div class="product-info-panel">
+      <span class="product-code-badge" id="prodCode">...</span>
+      <h1 id="prodName">Carregando...</h1>
+      <div class="product-rating-bar" style="margin-bottom: 14px;">
+        <span class="stars-val" id="prodStars">★★★★★</span>
+        <span class="rating-count" id="prodRatingText">(0 avaliações)</span>
+      </div>
+      <div class="product-info-price" id="prodPrice">R$ 0,00</div>
+      <p class="product-desc" id="prodDesc" style="font-size: 1rem; line-height: 1.7;"></p>
+      
+      <div class="sizes-selector-box">
+        <label style="font-weight: 700; font-size: 0.9rem; color: var(--ink);">Selecione sua Numeração:</label>
+        <div class="sizes-chips-list" id="prodSizes"></div>
+      </div>
+
+      <div style="margin-top: 28px;">
+        <a class="btn btn-whatsapp btn-lg btn-block" id="btnBuyWhatsapp" href="#" target="_blank" rel="noopener">
+          Comprar no WhatsApp 💬
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <section class="reviews-section">
+    <div class="review-box-card" style="max-width: 100%; text-align: left; margin-top: 40px;">
+      <h3>Avaliações deste Calçado</h3>
+      <p>Já comprou ou experimentou este modelo? Deixe sua nota para ajudar outras clientes!</p>
+
+      <form id="productReviewForm" class="review-form" style="margin-top: 20px;">
+        <div class="review-inputs">
+          <input type="text" id="reviewerName" placeholder="Seu Nome Completo" required>
+        </div>
+        <div style="display:flex; align-items:center; gap: 12px; margin: 6px 0;">
+          <label style="font-weight:700; font-size:0.88rem;">Sua Nota:</label>
+          <div class="star-rating-selector" id="formStarSelector">
+            <span data-val="1">★</span>
+            <span data-val="2">★</span>
+            <span data-val="3">★</span>
+            <span data-val="4">★</span>
+            <span data-val="5" class="active">★</span>
+          </div>
+        </div>
+        <textarea id="reviewerComment" rows="3" placeholder="O que achou do conforto, acabamento e tamanho da sandália?" required></textarea>
+        <button type="submit" class="btn btn-whatsapp" style="align-self: flex-start;">Enviar Avaliação</button>
+      </form>
+
+      <div class="reviews-list" id="productReviewsList">
+        <p style="color:var(--body-gray); font-size:0.9rem;">Carregando avaliações...</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap footer-bottom" style="border:none;">
+    <p>&copy; <span id="year"></span> Jeci Store. Todos os direitos reservados.</p>
+  </div>
+</footer>
+
+<script>
+(function() {
+  const WHATSAPP_NUMBER = "5586981247491";
+  const params = new URLSearchParams(window.location.search);
+  const prodId = params.get("id");
+
+  let currentProduct = null;
+  let selectedSize = "";
+  let selectedRating = 5;
+
+  async function loadProduct() {
+    if (!prodId) {
+      window.location.href = "catalogo.html";
+      return;
+    }
+
+    let prod = null;
+    if (db) {
+      const { data } = await db.from("produtos").select("*").eq("id", prodId).single();
+      prod = data;
+    }
+
+    if (!prod) {
+      const local = JSON.parse(localStorage.getItem("jeci_produtos") || "[]");
+      prod = local.find(p => String(p.id) === String(prodId));
+    }
+
+    if (!prod) {
+      alert("Calçado não encontrado!");
+      window.location.href = "catalogo.html";
+      return;
+    }
+
+    currentProduct = prod;
+    document.title = `${prod.nome} | Jeci Store`;
+    document.getElementById("prodImage").src = prod.imagem;
+    document.getElementById("prodCode").textContent = prod.codigo;
+    document.getElementById("prodName").textContent = prod.nome;
+    document.getElementById("prodPrice").textContent = `R$ ${Number(prod.preco).toFixed(2).replace('.', ',')}`;
+    document.getElementById("prodDesc").textContent = prod.descricao || "Sandália feminina desenvolvida para conforto e elegância diária.";
+
+    const sizesContainer = document.getElementById("prodSizes");
+    sizesContainer.innerHTML = "";
+    (prod.tamanhos || ["34","35","36","37","38","39"]).forEach((size, idx) => {
+      const btn = document.createElement("button");
+      btn.className = `size-btn ${idx === 0 ? 'selected' : ''}`;
+      btn.textContent = size;
+      if (idx === 0) selectedSize = size;
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".size-btn").forEach(b => b.classList.remove("selected"));
+        btn.classList.add("selected");
+        selectedSize = size;
+        updateWhatsappLink();
+      });
+      sizesContainer.appendChild(btn);
+    });
+
+    updateWhatsappLink();
+    loadReviews();
+  }
+
+  function updateWhatsappLink() {
+    const msg = `Olá! Tenho interesse no calçado:\n\n` +
+      `* Modelo: ${currentProduct.nome}\n` +
+      `* Código: ${currentProduct.codigo}\n` +
+      `* Preço: R$ ${Number(currentProduct.preco).toFixed(2)}\n` +
+      `* Tamanho Selecionado: ${selectedSize || 'A combinar'}\n` +
+      `* Foto: ${currentProduct.imagem}\n\n` +
+      `Gostaria de saber se ainda está disponível!`;
+    
+    document.getElementById("btnBuyWhatsapp").href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+  }
+
+  async function loadReviews() {
+    const listEl = document.getElementById("productReviewsList");
+    let reviews = [];
+
+    if (db) {
+      const { data } = await db.from("avaliacoes_produtos").select("*").eq("produto_id", prodId).order("created_at", { ascending: false });
+      reviews = data || [];
+    }
+
+    if (!reviews.length) {
+      const localReviews = JSON.parse(localStorage.getItem(`jeci_reviews_prod_${prodId}`) || "[]");
+      reviews = localReviews;
+    }
+
+    if (!reviews.length) {
+      listEl.innerHTML = `<p style="color:var(--body-gray); font-size:0.9rem;">Este modelo ainda não tem avaliações. Seja a primeira a avaliar!</p>`;
+      document.getElementById("prodStars").textContent = "★★★★★";
+      document.getElementById("prodRatingText").textContent = "(Novo modelo)";
+      return;
+    }
+
+    const avg = reviews.reduce((acc, r) => acc + r.estrelas, 0) / reviews.length;
+    document.getElementById("prodStars").textContent = "★".repeat(Math.round(avg)) + "☆".repeat(5 - Math.round(avg));
+    document.getElementById("prodRatingText").textContent = `(${reviews.length} avaliação${reviews.length > 1 ? 'ões' : ''})`;
+
+    listEl.innerHTML = "";
+    reviews.forEach(r => {
+      const card = document.createElement("div");
+      card.className = "review-item-card";
+      card.innerHTML = `
+        <div style="color:#f59e0b; font-size:0.9rem; margin-bottom:4px;">${"★".repeat(r.estrelas)}</div>
+        <p style="margin:0 0 6px; font-weight:600; color:var(--ink);">${r.comentario}</p>
+        <span style="font-size:0.8rem; color:var(--body-gray);">Por <strong>${r.nome_cliente || r.nome}</strong></span>
+      `;
+      listEl.appendChild(card);
+    });
+  }
+
+  // Seletor de estrelas
+  const starSpans = document.querySelectorAll("#formStarSelector span");
+  starSpans.forEach(span => {
+    span.addEventListener("click", function() {
+      selectedRating = parseInt(this.getAttribute("data-val"));
+      starSpans.forEach(s => {
+        const v = parseInt(s.getAttribute("data-val"));
+        s.classList.toggle("active", v <= selectedRating);
+      });
+    });
+  });
+
+  document.getElementById("productReviewForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+    const newRev = {
+      produto_id: prodId,
+      nome_cliente: document.getElementById("reviewerName").value.trim(),
+      estrelas: selectedRating,
+      comentario: document.getElementById("reviewerComment").value.trim()
+    };
+
+    if (db) {
+      await db.from("avaliacoes_produtos").insert([newRev]);
+    } else {
+      const localKey = `jeci_reviews_prod_${prodId}`;
+      const local = JSON.parse(localStorage.getItem(localKey) || "[]");
+      local.unshift(newRev);
+      localStorage.setItem(localKey, JSON.stringify(local));
+    }
+
+    this.reset();
+    alert("Obrigada! Sua avaliação foi cadastrada com sucesso.");
+    loadReviews();
+  });
+
+  document.getElementById("year").textContent = new Date().getFullYear();
+  loadProduct();
+})();
+</script>
+</body>
+</html>

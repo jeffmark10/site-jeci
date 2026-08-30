@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Catálogo de Sandálias e Calçados | Jeci Store</title>
+<title>Catálogo de Calçados | Jeci Store</title>
 <meta name="description" content="Explore todos os modelos de sandálias, rasteiras, papetes e saltos da Jeci Store. Conforto garantido.">
 
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2250%22 fill=%22%23F2A9C7%22/><text x=%2250%22 y=%2266%22 font-size=%2248%22 fill=%22%23fff%22 text-anchor=%22middle%22 font-family=%22Georgia%22 font-style=%22italic%22>Js</text></svg>">
@@ -14,6 +14,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&family=Pinyon+Script&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
 <style>
   .catalog-hero {
     background: linear-gradient(155deg, var(--pink-mid) 0%, var(--pink-light) 45%, var(--paper) 95%);
@@ -60,16 +62,9 @@
 </head>
 <body>
 
-<!-- ============ HEADER ============ -->
 <header class="site-header">
   <div class="wrap header-inner">
-    <a class="brand" href="index.html" aria-label="Jeci Store - início">
-      <span class="brand-mark">
-        <svg viewBox="0 0 48 40" width="30" height="26">
-          <path d="M24 8c-3-6-11-8-15-4-4 4-2 12 4 16 4 3 8 4 11 4 3 0 7-1 11-4 6-4 8-12 4-16-4-4-12-2-15 4z" fill="none" stroke="currentColor" stroke-width="1.6"/>
-          <path d="M24 8v26M24 20c-2 2-3 5-2 8M24 20c2 2 3 5 2 8" fill="none" stroke="currentColor" stroke-width="1.4"/>
-        </svg>
-      </span>
+    <a class="brand" href="index.html">
       <span class="brand-word">
         <em class="brand-script">Js</em>
         <span class="brand-name">Jeci Store</span>
@@ -78,9 +73,8 @@
 
     <nav class="main-nav" id="mainNav">
       <a href="index.html">Início</a>
-      <a href="index.html#categorias">Categorias</a>
       <a href="catalogo.html" style="color: var(--pink-deep);">Catálogo de Calçados</a>
-      <a href="index.html#depoimentos">Avaliações</a>
+      <a href="index.html#depoimentos">Feedbacks</a>
     </nav>
 
     <div class="header-actions">
@@ -97,15 +91,14 @@
 <main>
   <section class="catalog-hero">
     <div class="wrap">
-      <p class="eyebrow">Coleção de Calçados Femininos</p>
+      <p class="eyebrow cute-sparkle">Coleção Completa de Calçados ✨</p>
       <h1 class="section-title">Nossos Modelos</h1>
-      <p style="max-width: 52ch; margin: 0 auto; color: var(--body-gray);">Encontre a sandália ou sapato perfeito para você. Peça direto com nosso time no WhatsApp.</p>
+      <p style="max-width: 52ch; margin: 0 auto; color: var(--body-gray);">Escolha seu modelo favorito, veja avaliações reais e peça diretamente pelo WhatsApp.</p>
     </div>
   </section>
 
   <section class="section" style="padding-top: 0;">
     <div class="wrap">
-      
       <div class="catalog-controls">
         <div class="filter-group">
           <input type="text" id="catSearch" class="filter-input" placeholder="🔍 Buscar modelo ou código..." style="min-width: 220px;">
@@ -121,7 +114,6 @@
 
           <select id="catSort" class="filter-select">
             <option value="default">Ordenar por</option>
-            <option value="rating">Mais bem avaliados ★</option>
             <option value="price-asc">Menor Preço</option>
             <option value="price-desc">Maior Preço</option>
             <option value="name-asc">Nome (A-Z)</option>
@@ -132,7 +124,6 @@
       </div>
 
       <div class="product-grid" id="fullCatalogGrid"></div>
-
     </div>
   </section>
 </main>
@@ -179,7 +170,6 @@
   const sortSelect = document.getElementById("catSort");
   const counter = document.getElementById("itemCount");
 
-  // Ler categoria da URL se houver (ex: ?cat=Papetes)
   const urlParams = new URLSearchParams(window.location.search);
   const catParam = urlParams.get("cat");
   if (catParam) categorySelect.value = catParam;
@@ -209,9 +199,7 @@
       );
     }
 
-    if (sort === "rating") {
-      filtered.sort((a, b) => (b.avaliacao || 5) - (a.avaliacao || 5));
-    } else if (sort === "price-asc") {
+    if (sort === "price-asc") {
       filtered.sort((a, b) => a.preco - b.preco);
     } else if (sort === "price-desc") {
       filtered.sort((a, b) => b.preco - a.preco);
@@ -231,28 +219,33 @@
         `* Código: ${prod.codigo}\n` +
         `* Modelo: ${prod.nome}\n` +
         `* Preço: R$ ${Number(prod.preco).toFixed(2)}\n` +
-        `* Numerações: ${prod.tamanhos && prod.tamanhos.length > 0 ? prod.tamanhos.join(", ") : "34 ao 39"}\n` +
-        `* Foto: ${prod.imagem.startsWith("data:") ? "[Foto do catálogo]" : prod.imagem}\n\n` +
+        `* Foto: ${prod.imagem}\n\n` +
         `Gostaria de saber a disponibilidade.`;
 
       article.innerHTML = `
         <div class="product-art-wrapper">
-          <img src="${prod.imagem}" alt="${prod.nome}" class="product-img" loading="lazy">
+          <a href="produto.html?id=${prod.id}">
+            <img src="${prod.imagem}" alt="${prod.nome}" class="product-img" loading="lazy">
+          </a>
         </div>
         <div class="swing-tag product-tag">
           <span class="tag-price">R$${price.inteiro}<sup>,${price.centavos}</sup></span>
         </div>
         
-        <div class="product-rating-bar">
-          <span class="stars-val">${"★".repeat(Math.round(prod.avaliacao || 5))}</span>
-          <span class="rating-count">(${prod.totalAvaliacoes || 1})</span>
-        </div>
+        <a href="produto.html?id=${prod.id}" class="product-rating-bar">
+          <span class="stars-val">★★★★★</span>
+          <span class="rating-count">Ver detalhes →</span>
+        </a>
 
         <span class="product-code-badge">${prod.codigo}</span>
-        <h3>${prod.nome}</h3>
+        <h3><a href="produto.html?id=${prod.id}">${prod.nome}</a></h3>
         <p class="product-desc">${prod.descricao || ""}</p>
         <p class="product-sizes-badge">Numerações: ${(prod.tamanhos || []).join(", ") || "34 ao 39"}</p>
-        <a class="btn btn-whatsapp btn-block" href="${getWhatsappLink(msg)}" target="_blank" rel="noopener">Comprar no WhatsApp</a>
+        
+        <div style="display:flex; gap:8px; margin-top:auto;">
+          <a class="btn btn-whatsapp btn-block" href="${getWhatsappLink(msg)}" target="_blank" rel="noopener">Comprar</a>
+          <a class="btn btn-outline" href="produto.html?id=${prod.id}" style="padding:10px 14px;">🔍</a>
+        </div>
       `;
 
       grid.appendChild(article);
@@ -260,16 +253,26 @@
   }
 
   async function loadData() {
+    if (db) {
+      const { data } = await db.from("produtos").select("*").order("created_at", { ascending: false });
+      if (data && data.length) {
+        products = data;
+        localStorage.setItem("jeci_produtos", JSON.stringify(products));
+        renderGrid();
+        return;
+      }
+    }
+
     const cached = localStorage.getItem("jeci_produtos");
     if (cached) {
       products = JSON.parse(cached);
       renderGrid();
       return;
     }
+
     try {
       const res = await fetch("produtos.json");
       products = await res.json();
-      localStorage.setItem("jeci_produtos", JSON.stringify(products));
       renderGrid();
     } catch (e) {}
   }

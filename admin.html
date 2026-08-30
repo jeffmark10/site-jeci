@@ -8,6 +8,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
 <style>
   body { background: var(--cream); padding: 30px 0; min-height: 100vh; }
   .admin-wrap { max-width: 960px; margin: 0 auto; padding: 0 20px; }
@@ -81,7 +83,7 @@
   <div class="admin-header">
     <div>
       <h1>Gerenciador de Calçados</h1>
-      <p>Catálogo & Avaliações da Jeci Store</p>
+      <p>Catálogo em Nuvem (Supabase & ImgBB)</p>
     </div>
     <div style="display:flex; gap:10px;">
       <a href="index.html" class="btn btn-outline btn-sm">← Loja</a>
@@ -109,7 +111,7 @@
 
         <div class="form-group">
           <label for="codigo">Código SKU *</label>
-          <input type="text" id="codigo" placeholder="ex: SAN-001, RAS-001..." required>
+          <input type="text" id="codigo" placeholder="ex: SAN-001" required>
         </div>
 
         <div class="form-group">
@@ -136,19 +138,20 @@
         </div>
 
         <div class="form-group full">
-          <label>Foto do Calçado</label>
+          <label>Foto do Calçado (Upload Automático ImgBB)</label>
           <div class="image-upload-box">
             <div class="image-preview-slot" id="previewContainer">Sem Foto</div>
             <div class="image-inputs">
               <input type="file" id="imgFile" accept="image/*">
+              <span id="uploadStatus" style="font-size:0.8rem; font-weight:700; color:var(--pink-deep); display:none;"></span>
               <input type="text" id="imgUrl" placeholder="Ou cole a URL direta da imagem">
             </div>
           </div>
         </div>
 
         <div class="form-group full">
-          <label for="descricao">Descrição (Palmilha, solado, fivela...)</label>
-          <textarea id="descricao" rows="2" placeholder="Detalhes de conforto, solado antiderrapante..."></textarea>
+          <label for="descricao">Descrição</label>
+          <textarea id="descricao" rows="2" placeholder="Palmilha, solado, acabamento..."></textarea>
         </div>
 
         <div class="form-group full" style="display:flex; gap:24px;">
@@ -162,8 +165,7 @@
       </div>
 
       <div style="margin-top: 20px; display: flex; gap: 10px;">
-        <button type="submit" class="btn btn-whatsapp" id="btnSave">Salvar Calçado</button>
-        <button type="button" class="btn btn-outline" id="btnCancel" style="display:none;">Cancelar</button>
+        <button type="submit" class="btn btn-whatsapp" id="btnSave">Salvar no Supabase</button>
       </div>
     </form>
   </div>
@@ -178,7 +180,6 @@
             <th>Código</th>
             <th>Modelo</th>
             <th>Preço</th>
-            <th>Nota</th>
             <th>Status</th>
             <th>Ações</th>
           </tr>
@@ -192,10 +193,10 @@
 <script>
 (function() {
   const ADMIN_PASSWORD = "jeci2026";
-  let products = [];
-  let currentImageData = "";
+  const IMGBB_API_KEY = "f230f2d81c42c92ba630ff6178c7bf55";
 
-  const SIZES = ["34", "35", "36", "37", "38", "39", "40"];
+  let products = [];
+  let currentImageUrl = "";
 
   function checkSession() {
     if (sessionStorage.getItem("jeci_auth") === "true") {
@@ -221,12 +222,11 @@
   });
 
   async function initCatalog() {
-    const cached = localStorage.getItem("jeci_produtos");
-    if (cached) {
-      products = JSON.parse(cached);
+    if (db) {
+      const { data } = await db.from("produtos").select("*").order("created_at", { ascending: false });
+      if (data) products = data;
     } else {
-      const res = await fetch("produtos.json");
-      products = await res.json();
+      products = JSON.parse(localStorage.getItem("jeci_produtos") || "[]");
     }
     setupSizeChips();
     renderTable();
@@ -238,15 +238,32 @@
     });
   }
 
-  document.getElementById("imgFile").addEventListener("change", function() {
+  // Upload ImgBB
+  document.getElementById("imgFile").addEventListener("change", async function() {
     const file = this.files[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      currentImageData = e.target.result;
-      document.getElementById("previewContainer").innerHTML = `<img src="${currentImageData}">`;
-    };
-    reader.readAsDataURL(file);
+
+    const statusEl = document.getElementById("uploadStatus");
+    statusEl.style.display = "block";
+    statusEl.textContent = "⏳ Enviando foto para o ImgBB...";
+
+    try {
+      const fd = new FormData();
+      fd.append("image", file);
+      const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: "POST", body: fd });
+      const d = await res.json();
+      if (d.success) {
+        currentImageUrl = d.data.url;
+        document.getElementById("imgUrl").value = currentImageUrl;
+        document.getElementById("previewContainer").innerHTML = `<img src="${currentImageUrl}">`;
+        statusEl.textContent = "✅ Foto enviada!";
+      } else {
+        throw new Error(d.error.message);
+      }
+    } catch (err) {
+      alert("Erro no upload da imagem: " + err.message);
+      statusEl.textContent = "❌ Falha no envio.";
+    }
   });
 
   function renderTable() {
@@ -259,35 +276,40 @@
         <td><strong>${p.codigo}</strong></td>
         <td>${p.nome}</td>
         <td>R$ ${Number(p.preco).toFixed(2)}</td>
-        <td>★ ${p.avaliacao || 5.0} (${p.totalAvaliacoes || 1})</td>
         <td>
           <button class="status-btn ${p.ativo ? 'active' : 'inactive'}" onclick="window.toggleStatus(${idx})">
             ${p.ativo ? '✅ Ativo' : '⏸️ Pausado'}
           </button>
         </td>
         <td>
-          <button class="btn btn-outline btn-sm" onclick="window.deleteProduct(${idx})">Excluir</button>
+          <button class="btn btn-outline btn-sm" onclick="window.deleteProduct('${p.id}', ${idx})">Excluir</button>
         </td>
       `;
       tbody.appendChild(tr);
     });
   }
 
-  window.toggleStatus = function(idx) {
+  window.toggleStatus = async function(idx) {
     products[idx].ativo = !products[idx].ativo;
+    if (db) {
+      await db.from("produtos").update({ ativo: products[idx].ativo }).eq("id", products[idx].id);
+    }
     localStorage.setItem("jeci_produtos", JSON.stringify(products));
     renderTable();
   };
 
-  window.deleteProduct = function(idx) {
+  window.deleteProduct = async function(id, idx) {
     if (confirm("Excluir este calçado?")) {
+      if (db) {
+        await db.from("produtos").delete().eq("id", id);
+      }
       products.splice(idx, 1);
       localStorage.setItem("jeci_produtos", JSON.stringify(products));
       renderTable();
     }
   };
 
-  document.getElementById("productForm").addEventListener("submit", function(e) {
+  document.getElementById("productForm").addEventListener("submit", async function(e) {
     e.preventDefault();
     const sizes = Array.from(document.querySelectorAll(".size-chip.selected")).map(c => c.textContent);
     
@@ -298,20 +320,22 @@
       nome: document.getElementById("nome").value.trim(),
       preco: parseFloat(document.getElementById("preco").value),
       descricao: document.getElementById("descricao").value.trim(),
-      imagem: currentImageData || document.getElementById("imgUrl").value.trim() || "https://images.unsplash.com/photo-1562273138-f46be4ebdf33?w=500",
+      imagem: currentImageUrl || document.getElementById("imgUrl").value.trim() || "https://images.unsplash.com/photo-1562273138-f46be4ebdf33?w=500",
       tamanhos: sizes,
-      avaliacao: 5.0,
-      totalAvaliacoes: 1,
       destaque: document.getElementById("destaque").checked,
       ativo: document.getElementById("ativo").checked
     };
 
-    products.push(newProd);
+    if (db) {
+      await db.from("produtos").insert([newProd]);
+    }
+
+    products.unshift(newProd);
     localStorage.setItem("jeci_produtos", JSON.stringify(products));
     renderTable();
     this.reset();
     document.getElementById("previewContainer").innerHTML = "Sem Foto";
-    currentImageData = "";
+    currentImageUrl = "";
     alert("Calçado cadastrado com sucesso!");
   });
 
