@@ -30,7 +30,34 @@
     return "★".repeat(full) + "☆".repeat(5 - full);
   }
 
-  /* RENDERIZAÇÃO DOS DESTAQUES */
+  /* MENU MOBILE */
+  function setupMobileMenu() {
+    const toggle = document.getElementById("navToggle");
+    const nav = document.getElementById("mainNav");
+    if (!toggle || !nav) return;
+
+    toggle.addEventListener("click", function(e) {
+      e.stopPropagation();
+      nav.classList.toggle("open");
+      toggle.classList.toggle("active");
+    });
+
+    document.querySelectorAll(".main-nav a").forEach(link => {
+      link.addEventListener("click", () => {
+        nav.classList.remove("open");
+        toggle.classList.remove("active");
+      });
+    });
+
+    document.addEventListener("click", function(e) {
+      if (!nav.contains(e.target) && !toggle.contains(e.target)) {
+        nav.classList.remove("open");
+        toggle.classList.remove("active");
+      }
+    });
+  }
+
+  /* RENDERIZAÇÃO DOS PRODUTOS NA HOME */
   function renderProducts(list) {
     const grid = document.getElementById("productGrid");
     if (!grid) return;
@@ -63,7 +90,7 @@
         `;
       }
 
-      const msg = `Olá! Tenho interesse na sandália:\n\n` +
+      const msg = `Olá! Tenho interesse no calçado:\n\n` +
         `* Código: ${prod.codigo}\n` +
         `* Modelo: ${prod.nome}\n` +
         `* Preço: R$ ${Number(prod.preco).toFixed(2)}\n` +
@@ -99,7 +126,7 @@
     setupScrollReveal();
   }
 
-  /* RENDERIZAÇÃO DOS FEEDBACKS REAIS */
+  /* RENDERIZAÇÃO DOS DEPOIMENTOS */
   function renderReviews() {
     const grid = document.getElementById("testiGrid");
     if (!grid) return;
@@ -121,6 +148,8 @@
   }
 
   async function loadInitialData() {
+    setupMobileMenu();
+
     if (db) {
       const { data } = await db.from("depoimentos_loja").select("*").order("created_at", { ascending: false });
       reviews = (data && data.length) ? data : DEFAULT_REVIEWS;
@@ -189,7 +218,7 @@
       renderReviews();
       storeForm.reset();
       updateStars(5);
-      alert("Obrigada pelo feedback! Sua avaliação foi publicada com sucesso.");
+      alert("Obrigada pelo feedback! Sua avaliação foi adicionada.");
     });
   }
 
