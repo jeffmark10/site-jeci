@@ -27,12 +27,24 @@
   .product-info-price { font-size: 2rem; font-weight: 800; color: var(--pink-deep); margin-bottom: 18px; font-family: var(--font-display); }
   
   .sizes-selector-box { margin: 20px 0; }
-  .sizes-chips-list { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+  .sizes-chips-list { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
   .size-btn {
-    border: 1.5px solid rgba(42,40,56,0.2); background: #fff; padding: 8px 16px;
-    border-radius: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+    border: 1.5px solid rgba(42,40,56,0.2); background: #fff; padding: 8px 14px;
+    border-radius: 10px; font-weight: 700; cursor: pointer; transition: all 0.2s; min-width: 44px; text-align: center;
   }
   .size-btn.selected, .size-btn:hover { background: var(--pink-deep); color: #fff; border-color: var(--pink-deep); transform: scale(1.05); }
+
+  .qty-selection-box { display: flex; align-items: center; gap: 16px; margin: 22px 0; }
+  .qty-box {
+    display: inline-flex; align-items: center; border: 1.5px solid rgba(42, 40, 56, 0.2);
+    border-radius: 999px; background: #fff; overflow: hidden;
+  }
+  .qty-btn-inline {
+    width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 1.2rem; color: var(--pink-deep); cursor: pointer;
+  }
+  .qty-btn-inline:hover { background: var(--pink-light); }
+  .qty-input-inline { width: 44px; text-align: center; font-weight: 800; font-size: 1.05rem; border: none; outline: none; }
 
   .reviews-section { margin-top: 60px; }
   .reviews-list { display: flex; flex-direction: column; gap: 14px; margin-top: 20px; }
@@ -53,10 +65,12 @@
     <nav class="main-nav" id="mainNav">
       <a href="index.html">Início</a>
       <a href="catalogo.html">Catálogo Completo</a>
-      <a href="index.html#depoimentos">Feedbacks</a>
+      <a href="carrinho.html">Meu Carrinho 🛍️</a>
     </nav>
     <div class="header-actions">
-      <a class="btn btn-outline btn-sm" href="catalogo.html">← Voltar</a>
+      <a class="btn btn-whatsapp btn-sm" href="carrinho.html" id="headerCartBtn">
+        <span>🛍️ Carrinho (<span id="cartCountBadge">0</span>)</span>
+      </a>
     </div>
   </div>
 </header>
@@ -78,14 +92,23 @@
       <p class="product-desc" id="prodDesc" style="font-size: 1rem; line-height: 1.7;"></p>
       
       <div class="sizes-selector-box">
-        <label style="font-weight: 700; font-size: 0.9rem; color: var(--ink);">Selecione sua Numeração:</label>
+        <label style="font-weight: 700; font-size: 0.9rem; color: var(--ink);">Selecione sua Numeração (30 ao 45):</label>
         <div class="sizes-chips-list" id="prodSizes"></div>
       </div>
 
-      <div style="margin-top: 28px;">
-        <a class="btn btn-whatsapp btn-lg btn-block" id="btnBuyWhatsapp" href="#" target="_blank" rel="noopener">
-          Comprar no WhatsApp 💬
-        </a>
+      <div class="qty-selection-box">
+        <label style="font-weight: 700; font-size: 0.9rem; color: var(--ink);">Quantidade:</label>
+        <div class="qty-box">
+          <button class="qty-btn-inline" id="btnQtyMinus">−</button>
+          <input type="text" class="qty-input-inline" id="productQtyInput" value="1" readonly>
+          <button class="qty-btn-inline" id="btnQtyPlus">+</button>
+        </div>
+      </div>
+
+      <div style="margin-top: 28px; display:flex; gap:12px; flex-wrap:wrap;">
+        <button class="btn btn-whatsapp btn-lg btn-block" id="btnAddToCart">
+          Adicionar ao Carrinho 🛍️
+        </button>
       </div>
     </div>
   </div>
@@ -128,13 +151,22 @@
 
 <script>
 (function() {
-  const WHATSAPP_NUMBER = "5586981247491";
   const params = new URLSearchParams(window.location.search);
   const prodId = params.get("id");
 
   let currentProduct = null;
   let selectedSize = "";
+  let selectedQuantity = 1;
   let selectedRating = 5;
+
+  const ALL_POSSIBLE_SIZES = ["30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45"];
+
+  function updateCartBadge() {
+    const cart = JSON.parse(localStorage.getItem("jeci_cart") || "[]");
+    const count = cart.reduce((s, i) => s + i.qtd, 0);
+    const badge = document.getElementById("cartCountBadge");
+    if (badge) badge.textContent = count;
+  }
 
   async function loadProduct() {
     if (!prodId) {
@@ -169,7 +201,10 @@
 
     const sizesContainer = document.getElementById("prodSizes");
     sizesContainer.innerHTML = "";
-    (prod.tamanhos || ["34","35","36","37","38","39"]).forEach((size, idx) => {
+    
+    const sizesToRender = (Array.isArray(prod.tamanhos) && prod.tamanhos.length > 0) ? prod.tamanhos : ALL_POSSIBLE_SIZES;
+    
+    sizesToRender.forEach((size, idx) => {
       const btn = document.createElement("button");
       btn.className = `size-btn ${idx === 0 ? 'selected' : ''}`;
       btn.textContent = size;
@@ -178,26 +213,57 @@
         document.querySelectorAll(".size-btn").forEach(b => b.classList.remove("selected"));
         btn.classList.add("selected");
         selectedSize = size;
-        updateWhatsappLink();
       });
       sizesContainer.appendChild(btn);
     });
 
-    updateWhatsappLink();
     loadReviews();
   }
 
-  function updateWhatsappLink() {
-    const msg = `Olá! Tenho interesse no calçado:\n\n` +
-      `* Modelo: ${currentProduct.nome}\n` +
-      `* Código: ${currentProduct.codigo}\n` +
-      `* Preço: R$ ${Number(currentProduct.preco).toFixed(2)}\n` +
-      `* Tamanho Selecionado: ${selectedSize || 'A combinar'}\n` +
-      `* Foto: ${currentProduct.imagem}\n\n` +
-      `Gostaria de confirmar a disponibilidade!`;
+  // Controles de Quantidade
+  document.getElementById("btnQtyMinus").addEventListener("click", () => {
+    if (selectedQuantity > 1) {
+      selectedQuantity--;
+      document.getElementById("productQtyInput").value = selectedQuantity;
+    }
+  });
+
+  document.getElementById("btnQtyPlus").addEventListener("click", () => {
+    selectedQuantity++;
+    document.getElementById("productQtyInput").value = selectedQuantity;
+  });
+
+  // Adicionar ao Carrinho
+  document.getElementById("btnAddToCart").addEventListener("click", () => {
+    if (!selectedSize) {
+      alert("Por favor, selecione uma numeração!");
+      return;
+    }
+
+    const cart = JSON.parse(localStorage.getItem("jeci_cart") || "[]");
+    const existingIndex = cart.findIndex(item => item.id === currentProduct.id && item.tamanho === selectedSize);
+
+    if (existingIndex !== -1) {
+      cart[existingIndex].qtd += selectedQuantity;
+    } else {
+      cart.push({
+        id: currentProduct.id,
+        codigo: currentProduct.codigo,
+        nome: currentProduct.nome,
+        preco: currentProduct.preco,
+        imagem: currentProduct.imagem,
+        tamanho: selectedSize,
+        qtd: selectedQuantity
+      });
+    }
+
+    localStorage.setItem("jeci_cart", JSON.stringify(cart));
+    updateCartBadge();
     
-    document.getElementById("btnBuyWhatsapp").href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
-  }
+    if (confirm(`✅ ${selectedQuantity}x ${currentProduct.nome} (Nº ${selectedSize}) adicionado ao carrinho!\n\nDeseja ir para o carrinho agora?`)) {
+      window.location.href = "carrinho.html";
+    }
+  });
 
   async function loadReviews() {
     const listEl = document.getElementById("productReviewsList");
@@ -238,7 +304,6 @@
     });
   }
 
-  // Seletor de estrelas
   const starSpans = document.querySelectorAll("#formStarSelector span");
   function setStars(v) {
     selectedRating = v;
@@ -277,6 +342,7 @@
   });
 
   document.getElementById("year").textContent = new Date().getFullYear();
+  updateCartBadge();
   loadProduct();
 })();
 </script>

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meu Carrinho | Jeci Store</title>
+
+<link rel="icon" type="image/jpeg" href="WhatsApp Image 2026-08-30 at 09.59.19.jpeg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&family=Pinyon+Script&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+
+<style>
+  .cart-wrap { padding: 40px 0 80px; }
+  .cart-grid-layout { display: grid; grid-template-columns: 1.6fr 1fr; gap: 32px; margin-top: 24px; align-items: start; }
+  
+  .cart-items-card, .cart-summary-card {
+    background: var(--paper); border-radius: var(--radius); padding: 26px;
+    border: 1.5px solid rgba(227, 73, 136, 0.12); box-shadow: var(--shadow-card);
+  }
+
+  .cart-item {
+    display: grid; grid-template-columns: 80px 1fr auto; gap: 18px; align-items: center;
+    padding: 16px 0; border-bottom: 1px solid rgba(42, 40, 56, 0.08);
+  }
+  .cart-item:last-child { border-bottom: none; }
+  .cart-item-img { width: 80px; height: 80px; border-radius: 12px; object-fit: cover; background: var(--cream); }
+  
+  .cart-item-details h4 { margin: 0 0 4px; font-size: 1.05rem; }
+  .cart-item-meta { font-size: 0.85rem; color: var(--body-gray); margin-bottom: 8px; }
+  
+  .qty-control {
+    display: inline-flex; align-items: center; border: 1.5px solid rgba(42, 40, 56, 0.15);
+    border-radius: 999px; background: var(--cream); overflow: hidden;
+  }
+  .qty-btn {
+    width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 1.1rem; color: var(--pink-deep); cursor: pointer; transition: background 0.2s;
+  }
+  .qty-btn:hover { background: var(--pink-light); }
+  .qty-val { width: 36px; text-align: center; font-weight: 700; font-size: 0.95rem; }
+
+  .cart-item-actions { text-align: right; }
+  .cart-item-price { font-weight: 800; font-size: 1.15rem; color: var(--pink-deep); margin-bottom: 8px; }
+  .btn-remove-item { font-size: 0.82rem; color: #dc3545; font-weight: 700; text-decoration: underline; cursor: pointer; }
+
+  .summary-row { display: flex; justify-content: space-between; margin-bottom: 14px; font-size: 0.95rem; }
+  .summary-row.total { font-size: 1.3rem; font-weight: 800; color: var(--ink); border-top: 1.5px dashed rgba(227,73,136,0.25); padding-top: 14px; }
+
+  .empty-cart-state { text-align: center; padding: 60px 20px; background: var(--paper); border-radius: var(--radius); border: 1.5px solid rgba(227,73,136,0.12); }
+
+  @media (max-width: 860px) {
+    .cart-grid-layout { grid-template-columns: 1fr; }
+    .cart-item { grid-template-columns: 70px 1fr; gap: 14px; }
+    .cart-item-actions { grid-column: span 2; display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed rgba(42,40,56,0.06); padding-top: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html">
+      <img src="WhatsApp Image 2026-08-30 at 09.59.19.jpeg" alt="Logo" class="brand-logo-img">
+      <span class="brand-name">Jeci Store</span>
+    </a>
+
+    <nav class="main-nav" id="mainNav">
+      <a href="index.html">Início</a>
+      <a href="catalogo.html">Catálogo Completo</a>
+      <a href="index.html#depoimentos">Feedbacks</a>
+    </nav>
+
+    <div class="header-actions">
+      <a class="btn btn-outline btn-sm" href="catalogo.html">← Continuar Comprando</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap cart-wrap">
+  <p class="eyebrow cute-sparkle">Finalize seu Pedido ✨</p>
+  <h1 class="section-title">Meu Carrinho de Compras</h1>
+
+  <div id="cartContainer"></div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap footer-bottom" style="border:none;">
+    <p>&copy; <span id="year"></span> Jeci Store. Todos os direitos reservados.</p>
+  </div>
+</footer>
+
+<script>
+(function() {
+  "use strict";
+  const WHATSAPP_NUMBER = "5586981247491";
+  let cart = JSON.parse(localStorage.getItem("jeci_cart") || "[]");
+
+  function saveCart() {
+    localStorage.setItem("jeci_cart", JSON.stringify(cart));
+    renderCart();
+  }
+
+  function renderCart() {
+    const container = document.getElementById("cartContainer");
+    if (cart.length === 0) {
+      container.innerHTML = `
+        <div class="empty-cart-state">
+          <span style="font-size:3.5rem; display:block; margin-bottom:12px;">🛍️</span>
+          <h2>Seu carrinho está vazio!</h2>
+          <p style="color:var(--body-gray); margin-bottom:24px;">Explore nosso catálogo e encontre sandálias, papetes e saltos perfeitos para você.</p>
+          <a class="btn btn-whatsapp" href="catalogo.html">Explorar Calçados</a>
+        </div>
+      `;
+      return;
+    }
+
+    let subtotal = 0;
+    let itemsMarkup = cart.map((item, index) => {
+      const itemTotal = item.preco * item.qtd;
+      subtotal += itemTotal;
+
+      return `
+        <div class="cart-item">
+          <img src="${item.imagem}" alt="${item.nome}" class="cart-item-img">
+          <div class="cart-item-details">
+            <span class="product-code-badge">${item.codigo}</span>
+            <h4>${item.nome}</h4>
+            <div class="cart-item-meta">
+              <span>Tamanho: <strong>${item.tamanho}</strong></span> &middot; 
+              <span>Unitário: R$ ${Number(item.preco).toFixed(2).replace('.', ',')}</span>
+            </div>
+            <div class="qty-control">
+              <button class="qty-btn" onclick="window.updateQty(${index}, -1)">−</button>
+              <span class="qty-val">${item.qtd}</span>
+              <button class="qty-btn" onclick="window.updateQty(${index}, 1)">+</button>
+            </div>
+          </div>
+          <div class="cart-item-actions">
+            <div class="cart-item-price">R$ ${itemTotal.toFixed(2).replace('.', ',')}</div>
+            <span class="btn-remove-item" onclick="window.removeItem(${index})">Remover</span>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    container.innerHTML = `
+      <div class="cart-grid-layout">
+        <div class="cart-items-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1.5px solid rgba(227,73,136,0.12); padding-bottom:12px;">
+            <h3 style="margin:0;">Itens Selecionados (${cart.reduce((s, i) => s + i.qtd, 0)})</h3>
+            <button class="btn-remove-item" onclick="window.clearCart()" style="font-size:0.85rem;">Limpar Carrinho</button>
+          </div>
+          ${itemsMarkup}
+        </div>
+
+        <div class="cart-summary-card">
+          <h3 style="margin-bottom:20px;">Resumo da Compra</h3>
+          <div class="summary-row">
+            <span>Subtotal dos calçados</span>
+            <strong>R$ ${subtotal.toFixed(2).replace('.', ',')}</strong>
+          </div>
+          <div class="summary-row">
+            <span>Envio / Entrega</span>
+            <span style="color:var(--whatsapp-dark); font-weight:700;">A combinar no WhatsApp</span>
+          </div>
+          <div class="summary-row total">
+            <span>Total</span>
+            <span style="color:var(--pink-deep);">R$ ${subtotal.toFixed(2).replace('.', ',')}</span>
+          </div>
+          <button class="btn btn-whatsapp btn-lg btn-block" onclick="window.checkoutWhatsApp()" style="margin-top:20px;">
+            Finalizar Pedido no WhatsApp 💬
+          </button>
+          <p style="font-size:0.8rem; text-align:center; color:var(--body-gray); margin-top:12px;">
+            ✿ Pagamento via Pix ou Cartão em até 6x.<br>Atendimento personalizado direto com a loja.
+          </p>
+        </div>
+      </div>
+    `;
+  }
+
+  window.updateQty = function(index, delta) {
+    if (cart[index]) {
+      cart[index].qtd += delta;
+      if (cart[index].qtd <= 0) {
+        cart.splice(index, 1);
+      }
+      saveCart();
+    }
+  };
+
+  window.removeItem = function(index) {
+    cart.splice(index, 1);
+    saveCart();
+  };
+
+  window.clearCart = function() {
+    if (confirm("Deseja esvaziar todo o seu carrinho?")) {
+      cart = [];
+      saveCart();
+    }
+  };
+
+  window.checkoutWhatsApp = function() {
+    if (cart.length === 0) return;
+
+    let subtotal = 0;
+    let itemsText = cart.map((item, idx) => {
+      const total = item.preco * item.qtd;
+      subtotal += total;
+      return `${idx + 1}. *${item.nome}* (${item.codigo})\n` +
+             `   • Tamanho: ${item.tamanho}\n` +
+             `   • Qtd: ${item.qtd}x (R$ ${Number(item.preco).toFixed(2)})\n` +
+             `   • Subtotal: R$ ${total.toFixed(2)}`;
+    }).join("\n\n");
+
+    const msg = `Olá! Gostaria de finalizar meu pedido na *Jeci Store*:\n\n` +
+                `🛍️ *ITENS DO PEDIDO:*\n${itemsText}\n\n` +
+                `💰 *VALOR TOTAL:* R$ ${subtotal.toFixed(2).replace('.', ',')}\n\n` +
+                `Gostaria de combinar a entrega e o pagamento!`;
+
+    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, "_blank");
+  };
+
+  document.getElementById("year").textContent = new Date().getFullYear();
+  renderCart();
+})();
+</script>
+</body>
+</html>

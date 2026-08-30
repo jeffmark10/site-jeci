@@ -31,12 +31,16 @@
       <a href="#categorias">Categorias</a>
       <a href="#produtos">Destaques</a>
       <a href="catalogo.html">Catálogo Completo</a>
+      <a href="carrinho.html">Meu Carrinho 🛍️</a>
       <a href="#depoimentos">Feedbacks</a>
       <a href="#faq">Dúvidas</a>
       <a href="#contato">Contato</a>
     </nav>
 
     <div class="header-actions">
+      <a class="btn btn-whatsapp btn-sm" href="carrinho.html" title="Ver Carrinho">
+        <span>🛍️ (<span id="homeCartCount">0</span>)</span>
+      </a>
       <a class="btn btn-whatsapp btn-sm js-whatsapp" data-msg="Olá! Vim pelo site da Jeci Store e quero tirar uma dúvida." href="#" target="_blank" rel="noopener">
         <span>WhatsApp</span>
       </a>
@@ -61,7 +65,7 @@
           <a class="btn btn-ghost btn-lg" href="catalogo.html">Explorar catálogo</a>
         </div>
         <ul class="hero-trust">
-          <li>Numerações do 34 ao 40</li>
+          <li>Numerações do 30 ao 45</li>
           <li>Troca fácil em até 7 dias</li>
           <li>Envio com mimo & carinho 🌸</li>
         </ul>
@@ -171,7 +175,7 @@
       <div class="faq-list" style="border-top:1px solid rgba(227,73,136,0.18);">
         <div class="faq-item" style="border-bottom:1px solid rgba(227,73,136,0.18); padding:16px 0;">
           <h4 style="margin:0 0 6px;">Como sei meu tamanho exato?</h4>
-          <p style="margin:0; font-size:0.92rem;">Nossos calçados possuem forma padrão do 34 ao 40. Pelo WhatsApp nós auxiliamos na medição da palmilha se preferir.</p>
+          <p style="margin:0; font-size:0.92rem;">Nossos calçados atendem do 30 ao 45. Pelo WhatsApp nós auxiliamos na medição da palmilha se preferir.</p>
         </div>
         <div class="faq-item" style="border-bottom:1px solid rgba(227,73,136,0.18); padding:16px 0;">
           <h4 style="margin:0 0 6px;">Qual a política de trocas?</h4>
@@ -202,6 +206,7 @@
     <div class="footer-col">
       <h4>Navegação</h4>
       <a href="catalogo.html">Catálogo Completo</a>
+      <a href="carrinho.html">Meu Carrinho 🛍️</a>
       <a href="#depoimentos">Feedbacks</a>
       <a href="admin.html" class="admin-discreet-link">Área Admin 🔒</a>
     </div>
@@ -218,5 +223,14 @@
 </a>
 
 <script src="script.js"></script>
+<script>
+  function updateHomeBadge() {
+    const cart = JSON.parse(localStorage.getItem("jeci_cart") || "[]");
+    const count = cart.reduce((s, i) => s + i.qtd, 0);
+    const badge = document.getElementById("homeCartCount");
+    if (badge) badge.textContent = count;
+  }
+  document.addEventListener("DOMContentLoaded", updateHomeBadge);
+</script>
 </body>
 </html>

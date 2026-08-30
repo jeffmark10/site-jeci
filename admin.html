@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Painel Administrativo | Jeci Store</title>
 
-<link rel="icon" type="image/jpeg" href="logo.png">
+<link rel="icon" type="image/png" href="logo.png">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -55,8 +55,8 @@
   
   .size-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
   .size-chip {
-    padding: 7px 16px; border-radius: 20px; border: 1.5px solid rgba(42,40,56,0.2);
-    font-size: 0.85rem; font-weight: 700; cursor: pointer; user-select: none; transition: all 0.2s;
+    padding: 7px 14px; border-radius: 20px; border: 1.5px solid rgba(42,40,56,0.2);
+    font-size: 0.85rem; font-weight: 700; cursor: pointer; user-select: none; transition: all 0.2s; min-width: 44px; text-align: center;
   }
   .size-chip.selected { background: var(--pink-deep); border-color: var(--pink-deep); color: #fff; transform: scale(1.05); }
 
@@ -165,8 +165,12 @@
           </div>
 
           <div class="form-group full">
-            <label>Numerações Disponíveis</label>
+            <label>Numerações Disponíveis (30 ao 45)</label>
             <div class="size-chips" id="sizeChipsContainer">
+              <span class="size-chip">30</span>
+              <span class="size-chip">31</span>
+              <span class="size-chip">32</span>
+              <span class="size-chip">33</span>
               <span class="size-chip selected">34</span>
               <span class="size-chip selected">35</span>
               <span class="size-chip selected">36</span>
@@ -174,6 +178,11 @@
               <span class="size-chip selected">38</span>
               <span class="size-chip selected">39</span>
               <span class="size-chip">40</span>
+              <span class="size-chip">41</span>
+              <span class="size-chip">42</span>
+              <span class="size-chip">43</span>
+              <span class="size-chip">44</span>
+              <span class="size-chip">45</span>
             </div>
           </div>
 

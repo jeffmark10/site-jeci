@@ -73,10 +73,14 @@
     <nav class="main-nav" id="mainNav">
       <a href="index.html">Início</a>
       <a href="catalogo.html" style="color: var(--pink-deep);">Catálogo de Calçados</a>
+      <a href="carrinho.html">Meu Carrinho 🛍️</a>
       <a href="index.html#depoimentos">Feedbacks</a>
     </nav>
 
     <div class="header-actions">
+      <a class="btn btn-whatsapp btn-sm" href="carrinho.html" id="catCartBtn">
+        <span>🛍️ (<span id="catCartCount">0</span>)</span>
+      </a>
       <a class="btn btn-whatsapp btn-sm" href="https://wa.me/5586981247491" target="_blank" rel="noopener">
         <span>WhatsApp</span>
       </a>
@@ -148,6 +152,7 @@
       <h4>Navegação</h4>
       <a href="index.html">Início</a>
       <a href="catalogo.html">Catálogo</a>
+      <a href="carrinho.html">Meu Carrinho</a>
       <a href="admin.html" class="admin-discreet-link">Área Admin 🔒</a>
     </div>
   </div>
@@ -173,6 +178,13 @@
   const urlParams = new URLSearchParams(window.location.search);
   const catParam = urlParams.get("cat");
   if (catParam) categorySelect.value = catParam;
+
+  function updateCartBadge() {
+    const cart = JSON.parse(localStorage.getItem("jeci_cart") || "[]");
+    const count = cart.reduce((s, i) => s + i.qtd, 0);
+    const badge = document.getElementById("catCartCount");
+    if (badge) badge.textContent = count;
+  }
 
   function formatPrice(val) {
     const parts = Number(val).toFixed(2).split(".");
@@ -271,10 +283,10 @@
         <span class="product-code-badge">${prod.codigo}</span>
         <h3><a href="produto.html?id=${prod.id}">${prod.nome}</a></h3>
         <p class="product-desc">${prod.descricao || ""}</p>
-        <p class="product-sizes-badge">Numerações: ${(Array.isArray(prod.tamanhos) ? prod.tamanhos : []).join(", ") || "34 ao 39"}</p>
+        <p class="product-sizes-badge">Numerações: ${(Array.isArray(prod.tamanhos) ? prod.tamanhos : []).join(", ") || "30 ao 45"}</p>
         
         <div style="display:flex; gap:8px; margin-top:auto;">
-          <a class="btn btn-whatsapp btn-block" href="${getWhatsappLink(msg)}" target="_blank" rel="noopener">Comprar</a>
+          <a class="btn btn-whatsapp btn-block" href="produto.html?id=${prod.id}">Comprar / Detalhes</a>
           <a class="btn btn-outline" href="produto.html?id=${prod.id}" style="padding:10px 14px;" title="Ver detalhes">🔍</a>
         </div>
       `;
@@ -312,11 +324,33 @@
   categorySelect.addEventListener("change", renderGrid);
   sortSelect.addEventListener("change", renderGrid);
 
+  // Ativação do Menu Mobile
   const toggle = document.getElementById("navToggle");
   const nav = document.getElementById("mainNav");
-  if (toggle && nav) toggle.addEventListener("click", () => nav.classList.toggle("open"));
+  if (toggle && nav) {
+    toggle.addEventListener("click", function (e) {
+      e.stopPropagation();
+      nav.classList.toggle("open");
+      toggle.classList.toggle("active");
+    });
+
+    document.querySelectorAll(".main-nav a").forEach(link => {
+      link.addEventListener("click", () => {
+        nav.classList.remove("open");
+        toggle.classList.remove("active");
+      });
+    });
+
+    document.addEventListener("click", function(e) {
+      if (!nav.contains(e.target) && !toggle.contains(e.target)) {
+        nav.classList.remove("open");
+        toggle.classList.remove("active");
+      }
+    });
+  }
 
   document.getElementById("year").textContent = new Date().getFullYear();
+  updateCartBadge();
   loadData();
 })();
 </script>
