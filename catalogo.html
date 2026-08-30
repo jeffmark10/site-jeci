@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Catálogo Completo | Jeci Store</title>
+<meta name="description" content="Explore todas as sandálias e camisetas da Jeci Store. Estilo, conforto e entrega para todo o Brasil.">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2250%22 fill=%22%23F2A9C7%22/><text x=%2250%22 y=%2266%22 font-size=%2248%22 fill=%22%23fff%22 text-anchor=%22middle%22 font-family=%22Georgia%22 font-style=%22italic%22>Js</text></svg>">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&family=Pinyon+Script&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="styles.css">
+<style>
+  .catalog-hero {
+    background: linear-gradient(155deg, var(--pink-mid) 0%, var(--pink-light) 45%, var(--paper) 95%);
+    padding: 44px 0 32px;
+    text-align: center;
+  }
+  .catalog-controls {
+    background: var(--paper);
+    padding: 18px 22px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-tag);
+    margin: -24px auto 36px;
+    border: 1px solid rgba(226,78,138,0.12);
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .filter-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .filter-input, .filter-select {
+    font-family: inherit;
+    font-size: 0.9rem;
+    padding: 9px 14px;
+    border: 1.5px solid rgba(46,49,66,0.15);
+    border-radius: 999px;
+    outline: none;
+    background: #fff;
+  }
+  .filter-input:focus, .filter-select:focus {
+    border-color: var(--pink-deep);
+  }
+  .catalog-counter {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--body-gray);
+  }
+  .empty-catalog {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 48px 20px;
+    background: var(--cream);
+    border-radius: var(--radius);
+    color: var(--body-gray);
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header class="site-header" id="topo">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html" aria-label="Jeci Store - início">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 48 40" width="30" height="26">
+          <path d="M24 8c-3-6-11-8-15-4-4 4-2 12 4 16 4 3 8 4 11 4 3 0 7-1 11-4 6-4 8-12 4-16-4-4-12-2-15 4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M24 8v26M24 20c-2 2-3 5-2 8M24 20c2 2 3 5 2 8" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+      </span>
+      <span class="brand-word">
+        <em class="brand-script">Js</em>
+        <span class="brand-name">Jeci Store</span>
+      </span>
+    </a>
+
+    <nav class="main-nav" id="mainNav" aria-label="Navegação principal">
+      <a href="index.html">Início</a>
+      <a href="index.html#sobre">Sobre</a>
+      <a href="index.html#categorias">Categorias</a>
+      <a href="catalogo.html" style="color: var(--pink-deep);">Catálogo Completo</a>
+      <a href="index.html#faq">Dúvidas</a>
+    </nav>
+
+    <div class="header-actions">
+      <a class="btn btn-whatsapp btn-sm js-whatsapp" data-msg="Olá! Gostaria de tirar uma dúvida sobre os produtos da Jeci Store." href="#" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm0 18.1a8.1 8.1 0 0 1-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.1 8.1 0 1 1 12 20.1zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1s-.7.8-.9 1c-.2.2-.3.2-.6.1a6.6 6.6 0 0 1-3.3-2.9c-.2-.4.2-.4.6-1.3.1-.2 0-.4 0-.5L8.9 8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 2.9 2.9 0 0 0-.9 2.1c0 1.3.9 2.5 1 2.7.1.2 1.8 2.8 4.4 3.9.6.3 1.1.4 1.5.5.6.2 1.2.2 1.6.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2-.1-.1-.2-.2-.4-.3z"/></svg>
+        <span>WhatsApp</span>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="mainNav" aria-label="Abrir menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- ============ HERO DO CATÁLOGO ============ -->
+  <section class="catalog-hero">
+    <div class="wrap">
+      <p class="eyebrow">Coleção Completa</p>
+      <h1 class="section-title">Nossas Peças</h1>
+      <p style="max-width: 52ch; margin: 0 auto; color: var(--body-gray);">Escolha seu modelo favorito e faça seu pedido diretamente pelo WhatsApp com a nossa equipe.</p>
+    </div>
+  </section>
+
+  <!-- ============ VITRINE E FILTROS ============ -->
+  <section class="section" style="padding-top: 0;">
+    <div class="wrap">
+      
+      <div class="catalog-controls">
+        <div class="filter-group">
+          <input type="text" id="catSearch" class="filter-input" placeholder="🔍 Buscar modelo ou código..." style="min-width: 220px;">
+          
+          <select id="catCategory" class="filter-select">
+            <option value="ALL">Todas as Categorias</option>
+            <option value="Sandálias">Sandálias</option>
+            <option value="Camisetas">Camisetas</option>
+          </select>
+
+          <select id="catSort" class="filter-select">
+            <option value="default">Ordenar por</option>
+            <option value="price-asc">Menor Preço</option>
+            <option value="price-desc">Maior Preço</option>
+            <option value="name-asc">Nome (A-Z)</option>
+          </select>
+        </div>
+
+        <div class="catalog-counter" id="itemCount">Carregando peças...</div>
+      </div>
+
+      <div class="product-grid" id="fullCatalogGrid">
+        <!-- Injetado dinamicamente via JS -->
+      </div>
+
+    </div>
+  </section>
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="site-footer" id="contato">
+  <div class="wrap footer-inner">
+    <div class="footer-brand">
+      <span class="brand-word">
+        <em class="brand-script">Js</em>
+        <span class="brand-name">Jeci Store</span>
+      </span>
+      <p>Sandálias e camisetas com estilo, conforto e exclusividade.</p>
+    </div>
+
+    <div class="footer-col">
+      <h4>Contato</h4>
+      <p>Loja 100% online<br>Atendimento de segunda a sábado</p>
+      <a class="footer-whatsapp js-whatsapp" data-msg="Olá! Vim pelo catálogo da Jeci Store." href="#" target="_blank" rel="noopener">+55 86 98124-7491</a>
+    </div>
+
+    <div class="footer-col">
+      <h4>Navegação</h4>
+      <a href="index.html">Início</a>
+      <a href="catalogo.html">Catálogo Completo</a>
+      <a href="admin.html" class="admin-discreet-link">Área Admin 🔒</a>
+    </div>
+  </div>
+
+  <div class="wrap footer-bottom">
+    <p>&copy; <span id="year"></span> Jeci Store. Todos os direitos reservados.</p>
+  </div>
+</footer>
+
+<script>
+(function() {
+  "use strict";
+
+  const WHATSAPP_NUMBER = "5586981247491";
+  let products = [];
+
+  const grid = document.getElementById("fullCatalogGrid");
+  const searchInput = document.getElementById("catSearch");
+  const categorySelect = document.getElementById("catCategory");
+  const sortSelect = document.getElementById("catSort");
+  const counter = document.getElementById("itemCount");
+
+  function formatPrice(val) {
+    const parts = Number(val).toFixed(2).split(".");
+    return { inteiro: parts[0], centavos: parts[1] };
+  }
+
+  function getWhatsappLink(message) {
+    return "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(message);
+  }
+
+  function renderGrid() {
+    const term = searchInput.value.trim().toLowerCase();
+    const cat = categorySelect.value;
+    const sort = sortSelect.value;
+
+    let filtered = products.filter(p => p.ativo);
+
+    if (cat !== "ALL") {
+      filtered = filtered.filter(p => p.categoria === cat);
+    }
+
+    if (term) {
+      filtered = filtered.filter(p => 
+        p.nome.toLowerCase().includes(term) || 
+        (p.codigo && p.codigo.toLowerCase().includes(term)) ||
+        (p.descricao && p.descricao.toLowerCase().includes(term))
+      );
+    }
+
+    if (sort === "price-asc") {
+      filtered.sort((a, b) => a.preco - b.preco);
+    } else if (sort === "price-desc") {
+      filtered.sort((a, b) => b.preco - a.preco);
+    } else if (sort === "name-asc") {
+      filtered.sort((a, b) => a.nome.localeCompare(b.nome));
+    }
+
+    counter.textContent = `${filtered.length} produto${filtered.length === 1 ? '' : 's'} encontrado${filtered.length === 1 ? '' : 's'}`;
+    grid.innerHTML = "";
+
+    if (filtered.length === 0) {
+      grid.innerHTML = `
+        <div class="empty-catalog">
+          <h3>Nenhum produto encontrado</h3>
+          <p>Tente buscar por outro termo ou selecione uma categoria diferente.</p>
+        </div>
+      `;
+      return;
+    }
+
+    filtered.forEach(prod => {
+      const price = formatPrice(prod.preco);
+      const article = document.createElement("article");
+      article.className = "product-card";
+
+      const msg = `Olá! Tenho interesse no produto:\n\n` +
+        `* Código: ${prod.codigo}\n` +
+        `* Item: ${prod.nome}\n` +
+        `* Preço: R$ ${Number(prod.preco).toFixed(2)}\n` +
+        `* Tamanhos: ${prod.tamanhos && prod.tamanhos.length > 0 ? prod.tamanhos.join(", ") : "Consulte"}\n` +
+        `* Foto: ${prod.imagem.startsWith("data:") ? "[Foto do catálogo]" : prod.imagem}\n\n` +
+        `Gostaria de confirmar a disponibilidade.`;
+
+      article.innerHTML = `
+        <div class="product-art-wrapper">
+          <img src="${prod.imagem}" alt="${prod.nome}" class="product-img" loading="lazy" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 130%22><rect fill=%22%23FBDCEA%22 width=%22200%22 height=%22130%22/><text x=%2250%%22 y=%2250%%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%23E24E8A%22 font-family=%22sans-serif%22 font-size=%2214%22>${prod.codigo}</text></svg>'">
+        </div>
+        <div class="swing-tag product-tag">
+          <span class="tag-price">R$${price.inteiro}<sup>,${price.centavos}</sup></span>
+        </div>
+        <span class="product-code-badge">${prod.codigo}</span>
+        <h3>${prod.nome}</h3>
+        <p class="product-desc">${prod.descricao || ""}</p>
+        <a class="btn btn-whatsapp btn-block js-whatsapp" href="${getWhatsappLink(msg)}" target="_blank" rel="noopener">Comprar no WhatsApp</a>
+      `;
+
+      grid.appendChild(article);
+    });
+  }
+
+  async function loadData() {
+    const cached = localStorage.getItem("jeci_produtos");
+    if (cached) {
+      try {
+        products = JSON.parse(cached);
+        renderGrid();
+        return;
+      } catch (e) {}
+    }
+
+    try {
+      const res = await fetch("produtos.json");
+      products = await res.json();
+      localStorage.setItem("jeci_produtos", JSON.stringify(products));
+      renderGrid();
+    } catch (err) {
+      grid.innerHTML = "<p class='center'>Não foi possível carregar o catálogo no momento.</p>";
+    }
+  }
+
+  // Links de WhatsApp estáticos
+  function setupWhatsappLinks() {
+    document.querySelectorAll(".js-whatsapp:not(.product-card .js-whatsapp)").forEach(link => {
+      const msg = link.getAttribute("data-msg") || "Olá! Vim pelo site da Jeci Store.";
+      link.setAttribute("href", getWhatsappLink(msg));
+    });
+  }
+
+  // Eventos de filtro
+  searchInput.addEventListener("input", renderGrid);
+  categorySelect.addEventListener("change", renderGrid);
+  sortSelect.addEventListener("change", renderGrid);
+
+  // Mobile Nav
+  const toggle = document.getElementById("navToggle");
+  const nav = document.getElementById("mainNav");
+  if (toggle && nav) {
+    toggle.addEventListener("click", () => nav.classList.toggle("open"));
+  }
+
+  // Ano
+  const yr = document.getElementById("year");
+  if (yr) yr.textContent = new Date().getFullYear();
+
+  setupWhatsappLinks();
+  loadData();
+})();
+</script>
+</body>
+</html>

@@ -9,54 +9,168 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 <style>
-  body { background: var(--cream); padding: 30px 0; }
+  body { background: var(--cream); padding: 30px 0; min-height: 100vh; }
   .admin-wrap { max-width: 960px; margin: 0 auto; padding: 0 20px; }
+  
+  /* Modal de Autenticação */
+  .auth-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--cream);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+  }
+  .auth-card {
+    background: var(--paper);
+    border-radius: 20px;
+    padding: 36px 28px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid rgba(226,78,138,0.18);
+    text-align: center;
+  }
+  .auth-card h2 { margin-bottom: 6px; }
+  .auth-card p { font-size: 0.9rem; margin-bottom: 20px; }
+  .auth-input-group { margin-bottom: 16px; text-align: left; }
+  .auth-error { color: #dc3545; font-size: 0.85rem; font-weight: 700; margin-top: 10px; display: none; }
+
+  /* Estrutura do Painel */
   .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
   .admin-card { background: var(--paper); border-radius: 16px; padding: 24px; box-shadow: var(--shadow-tag); margin-bottom: 24px; border: 1px solid rgba(226,78,138,0.12); }
   .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
   .form-group { display: flex; flex-direction: column; gap: 6px; }
   .form-group.full { grid-column: span 2; }
   label { font-weight: 700; font-size: 0.85rem; color: var(--ink); }
-  input, select, textarea { font-family: inherit; font-size: 0.95rem; padding: 10px 14px; border: 1.5px solid rgba(46,49,66,0.15); border-radius: 8px; outline: none; }
+  input, select, textarea { font-family: inherit; font-size: 0.95rem; padding: 10px 14px; border: 1.5px solid rgba(46,49,66,0.15); border-radius: 8px; outline: none; transition: border-color 0.2s; }
   input:focus, select:focus, textarea:focus { border-color: var(--pink-deep); }
-  .checkbox-group { display: flex; gap: 20px; align-items: center; margin-top: 10px; }
-  .checkbox-label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+  
+  /* Seletor Visual de Tamanhos (Chips) */
+  .size-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+  .size-chip {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1.5px solid rgba(46,49,66,0.2);
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.15s ease;
+  }
+  .size-chip.selected {
+    background: var(--pink-deep);
+    border-color: var(--pink-deep);
+    color: #fff;
+  }
+
+  /* Área de Upload e Preview da Foto */
+  .image-upload-box {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    border: 1.5px dashed rgba(226,78,138,0.4);
+    padding: 14px;
+    border-radius: 10px;
+    background: var(--cream);
+  }
+  .image-preview-slot {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    background: #fff;
+    border: 1px solid rgba(46,49,66,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .image-preview-slot img { width: 100%; height: 100%; object-fit: cover; }
+  .image-inputs { display: flex; flex-direction: column; gap: 8px; flex-grow: 1; }
+
+  /* Barra de Pesquisa e Filtros */
+  .table-controls { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+  .table-controls input, .table-controls select { padding: 8px 12px; font-size: 0.88rem; }
   .table-responsive { overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; text-align: left; margin-top: 14px; }
+  table { width: 100%; border-collapse: collapse; text-align: left; }
   th, td { padding: 12px; border-bottom: 1px solid rgba(46,49,66,0.08); font-size: 0.9rem; vertical-align: middle; }
   th { background: var(--pink-light); color: var(--pink-deep); font-family: var(--font-display); }
+  
+  /* Status Toggle */
+  .status-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+  }
+  .status-btn:hover { transform: scale(1.05); }
+  .status-btn.active { background: #d4edda; color: #155724; }
+  .status-btn.inactive { background: #f8d7da; color: #721c24; }
+  
+  tr.row-inactive td:not(:last-child) { opacity: 0.55; }
+
   .actions-cell { display: flex; gap: 8px; }
   .btn-danger { background: #dc3545; color: white; padding: 6px 12px; font-size: 0.8rem; border-radius: 6px; }
   .btn-edit { background: var(--pink-deep); color: white; padding: 6px 12px; font-size: 0.8rem; border-radius: 6px; }
-  .preview-thumb { width: 50px; height: 50px; object-fit: cover; border-radius: 6px; background: var(--cream); }
-  .admin-bar-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  .preview-thumb { width: 46px; height: 46px; object-fit: cover; border-radius: 6px; background: var(--cream); }
+  .admin-bar-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .btn-logout { background: transparent; color: var(--body-gray); border: 1.5px solid rgba(46,49,66,0.2); }
+  .btn-logout:hover { background: rgba(46,49,66,0.08); color: var(--ink); }
 </style>
 </head>
 <body>
 
-<div class="admin-wrap">
+<!-- MODAL DE LOGIN -->
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-card">
+    <span class="brand-script" style="font-size: 2.5rem; color: var(--pink-deep); display: block; margin-bottom: 8px;">Js</span>
+    <h2>Área Restrita</h2>
+    <p>Digite a senha administrativa para acessar o catálogo.</p>
+    <form id="authForm">
+      <div class="auth-input-group">
+        <label for="adminPass">Senha de Acesso</label>
+        <input type="password" id="adminPass" placeholder="••••••••" required style="width: 100%; margin-top: 4px;">
+      </div>
+      <button type="submit" class="btn btn-whatsapp btn-block">Entrar no Painel</button>
+      <p class="auth-error" id="authError">Senha incorreta. Tente novamente.</p>
+      <div style="margin-top: 14px;">
+        <a href="index.html" style="font-size: 0.85rem; color: var(--body-gray);">← Voltar para a loja</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- CONTEÚDO PRINCIPAL -->
+<div class="admin-wrap" id="adminContent" style="display: none;">
   <div class="admin-header">
     <div>
       <h1>Painel de Produtos</h1>
       <p>Gerencie o catálogo da Jeci Store</p>
     </div>
     <div class="admin-bar-actions">
-      <a href="index.html" class="btn btn-outline btn-sm">← Ir para a Loja</a>
+      <a href="index.html" class="btn btn-outline btn-sm">← Loja</a>
       <button id="btnExport" class="btn btn-whatsapp btn-sm">📥 Baixar produtos.json</button>
       <input type="file" id="importInput" accept=".json" style="display:none">
       <button id="btnImport" class="btn btn-ghost btn-sm">📤 Carregar JSON</button>
+      <button id="btnLogout" class="btn btn-logout btn-sm">Sair 🚪</button>
     </div>
   </div>
 
   <div class="admin-card">
-    <h2 id="formTitle">Novo Produto</h2>
+    <h2 id="formTitle">Adicionar Novo Produto</h2>
     <form id="productForm">
       <input type="hidden" id="prodId">
+      
       <div class="form-grid">
-        <div class="form-group">
-          <label for="codigo">Código SKU *</label>
-          <input type="text" id="codigo" placeholder="ex: SAN-001 ou CAM-001" required>
-        </div>
         <div class="form-group">
           <label for="categoria">Categoria *</label>
           <select id="categoria" required>
@@ -64,36 +178,56 @@
             <option value="Camisetas">Camisetas</option>
           </select>
         </div>
+
+        <div class="form-group">
+          <label for="codigo">Código SKU * <small style="color:var(--pink-deep); font-weight: normal;">(automático ou personalizado)</small></label>
+          <input type="text" id="codigo" placeholder="ex: SAN-001" required>
+        </div>
+
         <div class="form-group">
           <label for="nome">Nome do Produto *</label>
-          <input type="text" id="nome" placeholder="ex: Sandália Trança Boho" required>
+          <input type="text" id="nome" placeholder="ex: Sandália Rasteira Cristal" required>
         </div>
+
         <div class="form-group">
-          <label for="preco">Preço (R$) *</label>
+          <label for="preco">Preço de Venda (R$) *</label>
           <input type="number" id="preco" step="0.01" placeholder="89.90" required>
         </div>
+
+        <div class="form-group full">
+          <label>Tamanhos Disponíveis</label>
+          <div class="size-chips" id="sizeChipsContainer"></div>
+          <input type="text" id="tamanhosExtra" placeholder="Ou digite outros tamanhos separados por vírgula (ex: 33, 41, Especial)" style="margin-top: 8px;">
+        </div>
+
+        <div class="form-group full">
+          <label>Foto do Produto</label>
+          <div class="image-upload-box">
+            <div class="image-preview-slot" id="previewContainer">
+              <span style="font-size:0.75rem; color:var(--body-gray); text-align:center;">Sem Foto</span>
+            </div>
+            <div class="image-inputs">
+              <input type="file" id="imgFile" accept="image/*">
+              <input type="text" id="imgUrl" placeholder="Ou cole a URL direta da imagem">
+            </div>
+          </div>
+        </div>
+
         <div class="form-group full">
           <label for="descricao">Descrição Curta</label>
-          <textarea id="descricao" rows="2" placeholder="Detalhes de conforto, solado, tecido..."></textarea>
+          <textarea id="descricao" rows="2" placeholder="Detalhes de conforto, acabamento, palmilha, material..."></textarea>
         </div>
-        <div class="form-group full">
-          <label for="tamanhos">Tamanhos Disponíveis (separados por vírgula)</label>
-          <input type="text" id="tamanhos" placeholder="ex: 35, 36, 37, 38 ou P, M, G">
-        </div>
-        <div class="form-group full">
-          <label for="imgFile">Foto do Produto (Upload do Celular ou Computador)</label>
-          <input type="file" id="imgFile" accept="image/*">
-          <input type="text" id="imgUrl" placeholder="Ou cole o link direto da imagem" style="margin-top: 6px;">
-        </div>
-        <div class="form-group full checkbox-group">
-          <label class="checkbox-label">
+
+        <div class="form-group full" style="display:flex; gap:24px;">
+          <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
             <input type="checkbox" id="destaque" checked> Exibir nos Destaques da Home
           </label>
-          <label class="checkbox-label">
-            <input type="checkbox" id="ativo" checked> Produto Ativo (Disponível)
+          <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+            <input type="checkbox" id="ativo" checked> Produto Ativo (Disponível para venda)
           </label>
         </div>
       </div>
+
       <div style="margin-top: 20px; display: flex; gap: 10px;">
         <button type="submit" class="btn btn-whatsapp" id="btnSave">Salvar Produto</button>
         <button type="button" class="btn btn-outline" id="btnCancel" style="display:none;">Cancelar Edição</button>
@@ -102,7 +236,22 @@
   </div>
 
   <div class="admin-card">
-    <h2>Produtos Cadastrados</h2>
+    <h2>Produtos no Catálogo</h2>
+    
+    <div class="table-controls">
+      <input type="text" id="searchFilter" placeholder="🔍 Buscar por nome ou código..." style="flex-grow: 1;">
+      <select id="categoryFilter">
+        <option value="ALL">Todas as categorias</option>
+        <option value="Sandálias">Sandálias</option>
+        <option value="Camisetas">Camisetas</option>
+      </select>
+      <select id="statusFilter">
+        <option value="ALL">Todos os status</option>
+        <option value="active">Somente Ativos</option>
+        <option value="inactive">Somente Desativados</option>
+      </select>
+    </div>
+
     <div class="table-responsive">
       <table>
         <thead>
@@ -111,7 +260,8 @@
             <th>Código</th>
             <th>Nome</th>
             <th>Preço</th>
-            <th>Status</th>
+            <th>Tamanhos</th>
+            <th>Status (Clique p/ mudar)</th>
             <th>Ações</th>
           </tr>
         </thead>
@@ -123,18 +273,69 @@
 
 <script>
 (function() {
+  const ADMIN_PASSWORD = "jeci2026";
+
   let products = [];
-  let base64Image = "";
+  let currentImageData = "";
+
+  const SIZES_CONFIG = {
+    "Sandálias": ["34", "35", "36", "37", "38", "39", "40"],
+    "Camisetas": ["PP", "P", "M", "G", "GG"]
+  };
+
+  const authOverlay = document.getElementById("authOverlay");
+  const adminContent = document.getElementById("adminContent");
+  const authForm = document.getElementById("authForm");
+  const authError = document.getElementById("authError");
+  const btnLogout = document.getElementById("btnLogout");
 
   const form = document.getElementById("productForm");
   const tableBody = document.getElementById("tableBody");
   const fileInput = document.getElementById("imgFile");
+  const imgUrlInput = document.getElementById("imgUrl");
+  const previewContainer = document.getElementById("previewContainer");
+  const categorySelect = document.getElementById("categoria");
+  const skuInput = document.getElementById("codigo");
+  const sizeChipsContainer = document.getElementById("sizeChipsContainer");
+  const searchFilter = document.getElementById("searchFilter");
+  const categoryFilter = document.getElementById("categoryFilter");
+  const statusFilter = document.getElementById("statusFilter");
   const btnExport = document.getElementById("btnExport");
   const btnImport = document.getElementById("btnImport");
   const importInput = document.getElementById("importInput");
   const btnCancel = document.getElementById("btnCancel");
 
-  async function init() {
+  // Sessão
+  function checkSession() {
+    if (sessionStorage.getItem("jeci_auth") === "true") {
+      authOverlay.style.display = "none";
+      adminContent.style.display = "block";
+      initCatalog();
+    } else {
+      authOverlay.style.display = "flex";
+      adminContent.style.display = "none";
+    }
+  }
+
+  authForm.addEventListener("submit", function(e) {
+    e.preventDefault();
+    if (document.getElementById("adminPass").value.trim() === ADMIN_PASSWORD) {
+      sessionStorage.setItem("jeci_auth", "true");
+      authError.style.display = "none";
+      checkSession();
+    } else {
+      authError.style.display = "block";
+      document.getElementById("adminPass").value = "";
+    }
+  });
+
+  btnLogout.addEventListener("click", function() {
+    sessionStorage.removeItem("jeci_auth");
+    window.location.reload();
+  });
+
+  // Catálogo
+  async function initCatalog() {
     const cached = localStorage.getItem("jeci_produtos");
     if (cached) {
       products = JSON.parse(cached);
@@ -147,6 +348,8 @@
         products = [];
       }
     }
+    renderSizeChips();
+    suggestSKU();
     renderTable();
   }
 
@@ -155,30 +358,121 @@
     renderTable();
   }
 
+  // Alternar Status com 1 Clique
+  window.toggleStatus = function(index) {
+    products[index].ativo = !products[index].ativo;
+    saveToStorage();
+  };
+
+  function suggestSKU() {
+    if (document.getElementById("prodId").value !== "") return;
+    const cat = categorySelect.value;
+    const prefix = cat === "Sandálias" ? "SAN" : "CAM";
+    const sameCat = products.filter(p => p.codigo && p.codigo.startsWith(prefix));
+    const nextNum = String(sameCat.length + 1).padStart(3, "0");
+    skuInput.value = `${prefix}-${nextNum}`;
+  }
+
+  categorySelect.addEventListener("change", () => {
+    renderSizeChips();
+    suggestSKU();
+  });
+
+  function renderSizeChips(selected = []) {
+    sizeChipsContainer.innerHTML = "";
+    const list = SIZES_CONFIG[categorySelect.value] || [];
+    list.forEach(size => {
+      const chip = document.createElement("span");
+      chip.className = "size-chip" + (selected.includes(size) ? " selected" : "");
+      chip.textContent = size;
+      chip.addEventListener("click", () => chip.classList.toggle("selected"));
+      sizeChipsContainer.appendChild(chip);
+    });
+  }
+
   fileInput.addEventListener("change", function() {
     const file = this.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        base64Image = e.target.result;
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = new Image();
+      img.onload = function() {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        const MAX_WIDTH = 700;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > MAX_WIDTH) {
+          height = Math.round((height * MAX_WIDTH) / width);
+          width = MAX_WIDTH;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        ctx.drawImage(img, 0, 0, width, height);
+
+        currentImageData = canvas.toDataURL("image/jpeg", 0.82);
+        updatePreview(currentImageData);
+        imgUrlInput.value = "";
       };
-      reader.readAsDataURL(file);
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  imgUrlInput.addEventListener("input", function() {
+    if (this.value.trim()) {
+      currentImageData = this.value.trim();
+      updatePreview(currentImageData);
     }
   });
 
+  function updatePreview(src) {
+    if (src) {
+      previewContainer.innerHTML = `<img src="${src}" alt="Preview" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 50 50%22><rect fill=%22%23eee%22 width=%2250%22 height=%2250%22/></svg>'">`;
+    } else {
+      previewContainer.innerHTML = `<span style="font-size:0.75rem; color:var(--body-gray); text-align:center;">Sem Foto</span>`;
+    }
+  }
+
+  searchFilter.addEventListener("input", renderTable);
+  categoryFilter.addEventListener("change", renderTable);
+  statusFilter.addEventListener("change", renderTable);
+
   function renderTable() {
     tableBody.innerHTML = "";
-    products.forEach((prod, index) => {
+    const term = searchFilter.value.toLowerCase();
+    const catFilt = categoryFilter.value;
+    const statFilt = statusFilter.value;
+
+    const filtered = products.filter(p => {
+      const matchSearch = p.nome.toLowerCase().includes(term) || (p.codigo && p.codigo.toLowerCase().includes(term));
+      const matchCat = catFilt === "ALL" || p.categoria === catFilt;
+      const matchStat = statFilt === "ALL" || (statFilt === "active" ? p.ativo : !p.ativo);
+      return matchSearch && matchCat && matchStat;
+    });
+
+    filtered.forEach((prod) => {
+      const realIndex = products.findIndex(item => item.id === prod.id);
       const tr = document.createElement("tr");
+      if (!prod.ativo) tr.className = "row-inactive";
+
+      const statusBadge = prod.ativo 
+        ? `<button class="status-btn active" onclick="window.toggleStatus(${realIndex})" title="Clique para desativar">✅ Ativo</button>`
+        : `<button class="status-btn inactive" onclick="window.toggleStatus(${realIndex})" title="Clique para ativar">⏸️ Desativado</button>`;
+
       tr.innerHTML = `
         <td><img src="${prod.imagem}" class="preview-thumb" alt="${prod.nome}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 50 50%22><rect fill=%22%23eee%22 width=%2250%22 height=%2250%22/></svg>'"></td>
         <td><strong>${prod.codigo}</strong></td>
         <td>${prod.nome}</td>
         <td>R$ ${Number(prod.preco).toFixed(2)}</td>
-        <td>${prod.ativo ? '✅ Ativo' : '❌ Pausado'}</td>
+        <td><small>${(prod.tamanhos || []).join(", ") || "—"}</small></td>
+        <td>${statusBadge}</td>
         <td class="actions-cell">
-          <button class="btn-edit" onclick="window.editProduct(${index})">Editar</button>
-          <button class="btn-danger" onclick="window.deleteProduct(${index})">Excluir</button>
+          <button class="btn-edit" onclick="window.editProduct(${realIndex})">Editar</button>
+          <button class="btn-danger" onclick="window.deleteProduct(${realIndex})">Excluir</button>
         </td>
       `;
       tableBody.appendChild(tr);
@@ -193,14 +487,23 @@
     document.getElementById("nome").value = p.nome;
     document.getElementById("preco").value = p.preco;
     document.getElementById("descricao").value = p.descricao || "";
-    document.getElementById("tamanhos").value = (p.tamanhos || []).join(", ");
-    document.getElementById("imgUrl").value = p.imagem.startsWith("data:") ? "" : p.imagem;
     document.getElementById("destaque").checked = p.destaque;
     document.getElementById("ativo").checked = p.ativo;
-    base64Image = p.imagem.startsWith("data:") ? p.imagem : "";
+
+    const knownSizes = SIZES_CONFIG[p.categoria] || [];
+    const chipsSelected = (p.tamanhos || []).filter(s => knownSizes.includes(s));
+    const extraSizes = (p.tamanhos || []).filter(s => !knownSizes.includes(s));
+
+    renderSizeChips(chipsSelected);
+    document.getElementById("tamanhosExtra").value = extraSizes.join(", ");
+
+    currentImageData = p.imagem || "";
+    updatePreview(currentImageData);
+    imgUrlInput.value = currentImageData.startsWith("data:") ? "" : currentImageData;
 
     document.getElementById("formTitle").textContent = "Editar Produto: " + p.codigo;
     btnCancel.style.display = "inline-flex";
+    window.scrollTo({ top: form.offsetTop - 40, behavior: "smooth" });
   };
 
   window.deleteProduct = function(index) {
@@ -215,20 +518,26 @@
   function resetForm() {
     form.reset();
     document.getElementById("prodId").value = "";
-    document.getElementById("formTitle").textContent = "Novo Produto";
+    document.getElementById("formTitle").textContent = "Adicionar Novo Produto";
     btnCancel.style.display = "none";
-    base64Image = "";
+    currentImageData = "";
+    updatePreview("");
+    renderSizeChips();
+    suggestSKU();
   }
 
   form.addEventListener("submit", function(e) {
     e.preventDefault();
     const editIdx = document.getElementById("prodId").value;
-    const finalImg = base64Image || document.getElementById("imgUrl").value || "https://images.unsplash.com/photo-1562273138-f46be4ebdf33?w=500";
     
-    const sizes = document.getElementById("tamanhos").value
+    const selectedChips = Array.from(document.querySelectorAll(".size-chip.selected")).map(c => c.textContent);
+    const extraSizes = document.getElementById("tamanhosExtra").value
       .split(",")
       .map(s => s.trim())
       .filter(s => s.length > 0);
+    const allSizes = [...selectedChips, ...extraSizes];
+
+    const finalImg = currentImageData || "https://images.unsplash.com/photo-1562273138-f46be4ebdf33?w=500";
 
     const productData = {
       id: editIdx !== "" ? products[editIdx].id : String(Date.now()),
@@ -238,7 +547,7 @@
       preco: parseFloat(document.getElementById("preco").value),
       descricao: document.getElementById("descricao").value.trim(),
       imagem: finalImg,
-      tamanhos: sizes,
+      tamanhos: allSizes,
       destaque: document.getElementById("destaque").checked,
       ativo: document.getElementById("ativo").checked
     };
@@ -279,7 +588,7 @@
     reader.readAsText(file);
   });
 
-  init();
+  checkSession();
 })();
 </script>
 </body>
