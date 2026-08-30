@@ -83,7 +83,7 @@
         `;
       } else {
         ratingMarkup = `
-          <a href="produto.html?id=${encodeURIComponent(prod.id)}" class="product-rating-bar">
+          <a href="produto.html?id=${prod.id}" class="product-rating-bar">
             <span class="rating-count" style="color:var(--body-gray); font-weight:600;">✨ Novo Modelo &middot; Avaliar</span>
           </a>
         `;
@@ -165,12 +165,6 @@
       renderProducts(products);
       return;
     }
-
-    try {
-      const res = await fetch("produtos.json");
-      products = await res.json();
-      renderProducts(products);
-    } catch (e) {}
   }
 
   let storeStars = 5;
